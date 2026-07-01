@@ -1,0 +1,168 @@
+{
+  "version": "2.1",
+  "meta": {
+    "title": "BRIDGE OS",
+    "tagline": "כל פרויקט — סוכן ייעודי. כל סוכן — שיחה בטרמינל.",
+    "owner": ""
+  },
+  "worlds": [
+    { "id": "w1", "name": "מִשְׂרָד", "color": "#4fb8a8", "verb": "לתרגם נתונים להחלטות" },
+    { "id": "w2", "name": "מֶחְקָר", "color": "#9089d8", "verb": "לשאול את השאלה הנכונה" },
+    { "id": "w3", "name": "תַּרְגּוּם", "color": "#c75f73", "verb": "לשמר את הניגון" },
+    { "id": "w4", "name": "מִשְׁנַת יוֹסֵף", "color": "#d9a441", "verb": "שכל אחד יקבל את שלו" },
+    { "id": "w5", "name": "צָבָא", "color": "#94a35f", "verb": "לתת קול" },
+    { "id": "w6", "name": "הוֹרָאָה", "color": "#e0897a", "verb": "להעביר הלאה" }
+  ],
+  "threads": [
+    ["w1", "w2", "אותה שאלה על AI — מבפנים ומבחוץ"],
+    ["w6", "w2", "המורה שחוקר מורים"],
+    ["w1", "w6", "למידת מבוגרים — מהכיתה אל המחוז"],
+    ["w4", "w1", "Offline-first — למי שאין גישה"],
+    ["w3", "w4", "שני שירותים לקהילה השומרת מסורת"],
+    ["w3", "w2", "נאמנות מוחלטת למקור"],
+    ["w4", "w6", "להעביר · להפיץ · למסור"],
+    ["w5", "w1", "מנסח מסמך ואוסף עדויות"],
+    ["w3", "w6", "ספרות וניגון — להקשיב למילה"],
+    ["w5", "w2", "לאסוף עדויות — כמו ראיונות"]
+  ],
+  "projects": [
+    {
+      "id": "p1",
+      "name": "הזורעים בבינה",
+      "goal": "150 עובדים עברו הכשרת AI — חומרים, workshop, לוח זמנים מאושר",
+      "thread": ["w1", "w2"],
+      "path": "C:\\Users\\DAVID\\Desktop",
+      "progress": 0.65,
+      "status": "running",
+      "eta": null,
+      "insight": "מוכן לשלב ההוצאה לפועל. המכשול: לוחות זמנים.",
+      "workOrder": [
+        { "id": "s1", "task": "מצגת פתיחה — 9 שקפים", "done": true, "ai": false },
+        { "id": "s2", "task": "Flyer עברי + אנגלי", "done": true, "ai": false },
+        { "id": "s3", "task": "תיאום מועד עם מנהלי מחוז", "done": false, "ai": false },
+        { "id": "s4", "task": "Workshop מעשי 90 דקות", "done": false, "ai": false }
+      ],
+      "questions": [],
+      "answers": {}
+    },
+    {
+      "id": "p2",
+      "name": "מלאי משנת יוסף — Offline",
+      "goal": "מערכת ניהול מלאי פועלת ללא אינטרנט, מעקב החזרות לכל לקוח",
+      "thread": ["w4", "w1"],
+      "path": "C:\\Users\\DAVID\\Desktop\\פרויקטים\\mishnat-yosef\\mishnat-yosef",
+      "progress": 0.32,
+      "status": "waiting",
+      "eta": null,
+      "insight": "שאלות ארכיטקטורה קריטיות — הן קובעות את מבנה הנתונים כולו.",
+      "workOrder": [
+        { "id": "s1", "task": "ארכיטקטורה — 4 מודולים", "done": true, "ai": false },
+        { "id": "s2", "task": "inventory-manager.js", "done": false, "ai": false },
+        { "id": "s3", "task": "חיבור localStorage", "done": false, "ai": false },
+        { "id": "s4", "task": "ממשק לקוח מינימלי", "done": false, "ai": false }
+      ],
+      "questions": [
+        "כל לקוח רואה מלאי נפרד, או שיש מלאי משותף?",
+        "החזרה פגומה — חוזרת למלאי או נרשמת בצד?"
+      ],
+      "answers": {}
+    },
+    {
+      "id": "p3",
+      "name": "תזה — מורים חרדים ו-AI",
+      "goal": "פרק ממצאים מוגש — 6,000 מילים, 4 נושאים, הגהה סופית",
+      "thread": ["w2", "w6"],
+      "path": "C:\\Users\\DAVID\\Desktop",
+      "progress": 0.82,
+      "status": "running",
+      "eta": "שבוע",
+      "insight": "קרוב לסיום — עוד שתי פגישות עבודה.",
+      "workOrder": [
+        { "id": "s1", "task": "פרק ממצאים v8 — 5,680 מילים", "done": true, "ai": false },
+        { "id": "s2", "task": "חיזוק סעיף 3.2 — השוואה לבגן", "done": false, "ai": false },
+        { "id": "s3", "task": "הגהה סופית + מקורות APA", "done": false, "ai": false }
+      ],
+      "questions": [],
+      "answers": {}
+    },
+    {
+      "id": "p4",
+      "name": "ספר הריבניצר — תרגום רוסי",
+      "goal": "תרגום שלם, נאמן למקור, מתאים לקהל יהודי דתי דובר רוסית",
+      "thread": ["w3", "w4"],
+      "path": "C:\\Users\\DAVID\\Desktop\\פרויקטים\\תיקון שם השם ברוסית",
+      "progress": 0.44,
+      "status": "idle",
+      "eta": "חודשיים",
+      "insight": "הסגנון התייצב — אפשר להאיץ.",
+      "workOrder": [
+        { "id": "s1", "task": "פרקים 1–8 — טיוטה ראשונה", "done": true, "ai": false },
+        { "id": "s2", "task": "עריכה — פרקים 1–4", "done": false, "ai": false },
+        { "id": "s3", "task": "קריאת בדיקה עם דובר רוסית", "done": false, "ai": false },
+        { "id": "s4", "task": "פרקים 9–16 — תרגום", "done": false, "ai": false }
+      ],
+      "questions": [],
+      "answers": {}
+    },
+    {
+      "id": "p5",
+      "name": "מתמטיקה לחרדים",
+      "goal": "פלטפורמה חיה — 90+ שיעורים, PWA, מבחנים",
+      "thread": ["w6", "w4"],
+      "path": "C:\\Users\\DAVID\\Desktop\\פרויקטים\\מתמטיקה לחרדים מוכן",
+      "github": "DavidPatlas-AI/math-haredim",
+      "demo": "https://math-haredim.netlify.app",
+      "progress": 0.9,
+      "status": "running",
+      "eta": null,
+      "insight": "לייב ב-Netlify — math-haredim.netlify.app",
+      "workOrder": [
+        { "id": "s1", "task": "90+ שיעורים + GeoGebra", "done": true, "ai": false },
+        { "id": "s2", "task": "PWA + מבחנים", "done": true, "ai": false },
+        { "id": "s3", "task": "ניטור צפיות Netlify", "done": false, "ai": false }
+      ],
+      "questions": [],
+      "answers": {}
+    },
+    {
+      "id": "p6",
+      "name": "האלגוריתם שחזר בתשובה",
+      "goal": "שקיפות אלגוריתמית — דמו חי + ניטור צפיות",
+      "thread": ["w2", "w1"],
+      "path": "C:\\Users\\DAVID\\Desktop\\פרויקטים\\האלגוריתום שחזר בתשובה\\teshuva-algorithm-v2",
+      "github": "DavidPatlas-AI/teshuva-algorithm",
+      "demo": "https://teshuva-algorithm.netlify.app",
+      "progress": 0.75,
+      "status": "running",
+      "eta": null,
+      "insight": "לייב — צריך דשבורד analytics",
+      "workOrder": [
+        { "id": "s1", "task": "דמו אינטראקטיבי", "done": true, "ai": false },
+        { "id": "s2", "task": "תוסף Chrome", "done": true, "ai": false },
+        { "id": "s3", "task": "Netlify Function analytics", "done": false, "ai": false }
+      ],
+      "questions": [],
+      "answers": {}
+    },
+    {
+      "id": "p7",
+      "name": "מסלול רכב",
+      "goal": "קורס מכונאות — 19,000 רכבים, מוסך חי",
+      "thread": ["w1", "w6"],
+      "path": "C:\\Users\\DAVID\\Desktop\\פרויקטים\\מסלול רכב",
+      "github": "DavidPatlas-AI/maslul-rechev",
+      "demo": "https://maslul-rechev-2026.netlify.app",
+      "progress": 0.85,
+      "status": "running",
+      "eta": null,
+      "insight": "לייב — maslul-rechev-2026.netlify.app",
+      "workOrder": [
+        { "id": "s1", "task": "Command Center + 19K רכבים", "done": true, "ai": false },
+        { "id": "s2", "task": "בוט ווצאפ", "done": true, "ai": false },
+        { "id": "s3", "task": "עדכון תוכן 2026", "done": false, "ai": false }
+      ],
+      "questions": [],
+      "answers": {}
+    }
+  ]
+}

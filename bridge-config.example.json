@@ -1,0 +1,16 @@
+{
+  "github": {
+    "user": "DavidPatlas-AI",
+    "token": ""
+  },
+  "netlify": {
+    "token": ""
+  },
+  "portfolioPath": "",
+  "metricsCacheSeconds": 300,
+  "_help": {
+    "netlify.token": "Netlify > User settings > Applications > Personal access tokens. Requires Analytics addon per site.",
+    "github.token": "GitHub > Settings > Developer settings > Personal access tokens (public_repo read)",
+    "portfolioPath": "Optional full path to portfolio.html; auto-detected under Desktop if empty"
+  }
+}

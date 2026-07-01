@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>BridgeOS - מוח שולחן העבודה לפרויקטים</title>
+<style>
+:root{
+  --ink:#071019;
+  --panel:#101824;
+  --soft:#f5efe1;
+  --muted:#b5c0cf;
+  --gold:#e4b75d;
+  --mint:#65d5c7;
+  --coral:#ff7d73;
+  --blue:#81b7ff;
+  --line:rgba(255,255,255,.14);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+  margin:0;
+  background:var(--ink);
+  color:#eef4fb;
+  font-family:Heebo,Arial,system-ui,sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+  direction:ltr;
+}
+a{color:inherit;text-decoration:none}
+.hero{
+  min-height:86svh;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  overflow:hidden;
+  isolation:isolate;
+  background:#071019 url("assets/bridgeos-preview.png") center/cover no-repeat;
+}
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:rgba(5,9,16,.64);
+}
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:auto 0 0 0;
+  height:35%;
+  z-index:-1;
+  background:linear-gradient(0deg,var(--ink),rgba(7,16,25,0));
+}
+.nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:18px clamp(18px,4vw,48px);
+  direction:rtl;
+}
+.mark{
+  font-weight:900;
+  letter-spacing:.08em;
+  color:var(--gold);
+}
+.navlinks{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  font-size:14px;
+}
+.navlinks a{
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  padding:7px 12px;
+  background:rgba(7,16,25,.48);
+  backdrop-filter:blur(10px);
+}
+.hero-copy{
+  width:min(900px,92vw);
+  padding:0 clamp(18px,4vw,48px) 11svh;
+  direction:rtl;
+}
+.eyebrow{
+  display:inline-flex;
+  color:#071019;
+  background:var(--mint);
+  font-weight:800;
+  border-radius:999px;
+  padding:5px 11px;
+  font-size:13px;
+}
+h1{
+  margin:16px 0 10px;
+  font-size:clamp(44px,10vw,104px);
+  line-height:.95;
+  letter-spacing:0;
+}
+.hero-copy h1{
+  direction:ltr;
+  text-align:right;
+  max-width:100%;
+}
+.lead{
+  font-size:clamp(18px,2.2vw,25px);
+  width:min(760px,100%);
+  max-width:760px;
+  color:#d8e3f1;
+  unicode-bidi:plaintext;
+}
+.actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:26px;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  padding:10px 18px;
+  border-radius:999px;
+  font-weight:800;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(12px);
+  white-space:nowrap;
+}
+.btn.primary{
+  background:var(--gold);
+  color:#071019;
+  border-color:transparent;
+}
+.btn.mint{
+  background:var(--mint);
+  color:#071019;
+  border-color:transparent;
+}
+.scroll-note{
+  color:#91a0b4;
+  font-size:13px;
+  margin-top:18px;
+}
+section{
+  padding:56px clamp(18px,4vw,52px);
+  direction:rtl;
+}
+.band{
+  background:#0b1420;
+  border-top:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.wrap{max-width:1160px;margin:0 auto}
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:24px;
+  margin-bottom:24px;
+}
+h2{
+  margin:0;
+  font-size:clamp(28px,5vw,52px);
+  line-height:1.05;
+  letter-spacing:0;
+}
+.section-head p{
+  margin:0;
+  color:var(--muted);
+  max-width:460px;
+}
+.definition{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:22px;
+  align-items:stretch;
+}
+.statement{
+  background:var(--soft);
+  color:#15202b;
+  border-radius:8px;
+  padding:28px;
+  font-size:clamp(22px,3vw,35px);
+  font-weight:900;
+  line-height:1.22;
+  overflow-wrap:anywhere;
+}
+.statement small{
+  display:block;
+  color:#52606d;
+  font-size:15px;
+  font-weight:600;
+  margin-top:16px;
+}
+.brand-word{
+  direction:ltr;
+  unicode-bidi:isolate;
+  white-space:nowrap;
+}
+.mini-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.mini{
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:16px;
+  background:#101824;
+}
+.mini b{display:block;color:var(--gold);margin-bottom:6px}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+.card{
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#101824;
+  padding:20px;
+  min-height:160px;
+}
+.card h3{margin:0 0 8px;font-size:20px}
+.card p{margin:0;color:var(--muted)}
+.accent-mint{border-top:4px solid var(--mint)}
+.accent-gold{border-top:4px solid var(--gold)}
+.accent-coral{border-top:4px solid var(--coral)}
+.accent-blue{border-top:4px solid var(--blue)}
+.steps{
+  counter-reset:step;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.step{
+  counter-increment:step;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:18px;
+  background:#0d1723;
+}
+.step::before{
+  content:counter(step);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:var(--gold);
+  color:#071019;
+  font-weight:900;
+  margin-bottom:12px;
+}
+.step b{display:block;margin-bottom:6px}
+.step span{color:var(--muted);font-size:14px}
+.download{
+  display:grid;
+  grid-template-columns:.9fr 1.1fr;
+  gap:18px;
+  align-items:center;
+}
+.download-box{
+  background:var(--soft);
+  color:#15202b;
+  border-radius:8px;
+  padding:24px;
+}
+.download-box h2{color:#15202b}
+.code{
+  direction:ltr;
+  text-align:left;
+  display:block;
+  margin-top:12px;
+  border-radius:8px;
+  padding:12px;
+  color:#d9f7ef;
+  background:#071019;
+  overflow:auto;
+  font-family:"Cascadia Mono",Consolas,monospace;
+  font-size:13px;
+}
+.checklist{
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:20px;
+  background:#101824;
+}
+.check{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:10px;
+  align-items:start;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.check:last-child{border-bottom:0}
+.tick{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:var(--mint);
+  color:#071019;
+  font-weight:900;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:2px;
+}
+.faq{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.faq details{
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#101824;
+  padding:16px 18px;
+}
+.faq summary{
+  cursor:pointer;
+  font-weight:900;
+  color:#f3d494;
+}
+.faq p{color:var(--muted);margin:10px 0 0}
+footer{
+  padding:28px clamp(18px,4vw,52px);
+  color:#8f9caf;
+  border-top:1px solid rgba(255,255,255,.08);
+  direction:rtl;
+}
+@media(max-width:820px){
+  .nav{align-items:flex-start;flex-direction:column;padding:16px 18px}
+  .navlinks{width:100%;justify-content:flex-start;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+  .navlinks::-webkit-scrollbar{display:none}
+  .hero-copy{width:auto;max-width:100vw;margin:0;padding:0 20px 8svh;text-align:center;overflow:hidden}
+  .hero-copy h1{font-size:48px;text-align:center;line-height:1}
+  .lead{font-size:18px;width:min(320px,100%);max-width:320px;margin-inline:auto;overflow-wrap:anywhere}
+  .actions{display:grid;grid-template-columns:1fr;max-width:260px;margin-inline:auto}
+  .btn{width:100%}
+  .statement{font-size:23px;padding:22px}
+  .statement .brand-word{display:block;text-align:center;margin-bottom:4px}
+  .section-head{display:block}
+  .section-head p{margin-top:10px}
+  .definition,.download{grid-template-columns:1fr}
+  .cards,.steps,.faq{grid-template-columns:1fr}
+  .mini-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <nav class="nav" aria-label="ניווט">
+    <a class="mark" href="#">BRIDGE OS</a>
+    <div class="navlinks">
+      <a href="#idea">הרעיון</a>
+      <a href="#use">שימוש</a>
+      <a href="#download">הורדה</a>
+      <a href="index.html">פתח כלי</a>
+    </div>
+  </nav>
+  <div class="hero-copy">
+    <span class="eyebrow">מפת פרויקטים חיה לשולחן העבודה</span>
+    <h1>BridgeOS</h1>
+    <p class="lead">במקום לפזר פרויקטים בתיקיות, לינקים וקבצי טקסט, BridgeOS מציג את כולם כמוח עבודה אחד: עולמות, חוטים, סטטוס, קבצים, טרמינל וסוכן לכל פרויקט.</p>
+    <div class="actions">
+      <a class="btn primary" href="index.html">פתח את הכלי</a>
+      <a class="btn mint" href="dist/BridgeOS-portable.zip">הורד חבילה</a>
+      <a class="btn" href="#use">איך משתמשים</a>
+    </div>
+    <div class="scroll-note">האתר הזה מסביר את הרעיון בפשטות. הכלי עצמו רץ מקומית על המחשב שלך.</div>
+  </div>
+</header>
+
+<main>
+  <section id="idea">
+    <div class="wrap definition">
+      <div class="statement">
+        <span class="brand-word">BridgeOS</span> הוא “מוח שולחן עבודה” שמחבר בין הפרויקטים שלך, המצב שלהם, והפעולה הבאה שצריך לבצע.
+        <small>הוא לא מחליף את הקבצים שלך. הוא נותן להם מפה, הקשר, וכפתור פעולה ברור.</small>
+      </div>
+      <div class="mini-grid">
+        <div class="mini"><b>מפה</b>עולמות ופרויקטים מוצגים במרחב אחד, כך שרואים מה קשור למה.</div>
+        <div class="mini"><b>חוטים</b>קשרים בין תחומים, רעיונות וכלים מוצגים כשכבה שקופה.</div>
+        <div class="mini"><b>פעולה</b>לכל פרויקט יש תיקייה, טרמינל, סטטוס ומשימה קרובה.</div>
+        <div class="mini"><b>חיבור</b>פורטפוליו, מפת סטטוס, MCP, נתוני לייב וקבצים אחרונים במקום אחד.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>מה כבר מחובר</h2>
+        <p>המערכת בנויה כמוצר מקומי: היא נפתחת מהדסקטופ, רצה בדפדפן, ויכולה להתחבר לכלים אחרים בלי להעלות את המידע שלך לענן.</p>
+      </div>
+      <div class="cards">
+        <article class="card accent-gold"><h3>לוח 3D</h3><p>מפה ויזואלית של עולמות, פרויקטים וחוטים. לחיצה על עולם או פרויקט פותחת פאנל עבודה.</p></article>
+        <article class="card accent-mint"><h3>Overlay שקוף</h3><p>שכבת חוטים על שולחן העבודה, כמו ווידג׳ט חי שמראה את הקשרים בין הפרויקטים.</p></article>
+        <article class="card accent-blue"><h3>פורטפוליו ומדדים</h3><p>סנכרון לפרויקטים באתר, קישורי GitHub/Demo, סטטוס לייב ונתוני Netlify אם מוגדר token.</p></article>
+        <article class="card accent-coral"><h3>מפת סטטוס</h3><p>כפתור סטטוס מחפש את מפת הפרויקטים מהמחשב ופותח אותה ישירות מתוך BridgeOS.</p></article>
+        <article class="card accent-mint"><h3>MCP</h3><p>שרת מקומי ל-Claude / Cursor, כדי שסוכן יוכל לקרוא פרויקטים, לפתוח טרמינל ולראות dashboard.</p></article>
+        <article class="card accent-gold"><h3>חבילת הורדה</h3><p>אפשר לארוז את התיקייה כ-ZIP נקי בלי טוקנים אישיים, ואז להעביר או לפרסם כגרסה ניידת.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="use">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>איך משתמשים</h2>
+        <p>הכוונה היא לפתוח, לראות, ולפעול. לא לחפש באיזה קובץ שמרת מה.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><b>פותחים</b><span>לחץ על `הפעל שולחן עבודה.bat` בתיקיית BridgeOS או בקיצור שעל שולחן העבודה.</span></div>
+        <div class="step"><b>מוסיפים פרויקט</b><span>בכלי לחץ `+ פרויקט`, בחר עולם, נתיב תיקייה ומשימה קרובה.</span></div>
+        <div class="step"><b>עובדים</b><span>לחץ על פרויקט כדי לפתוח תיקייה, טרמינל, סטטוס, משימות וקבצים אחרונים.</span></div>
+        <div class="step"><b>עוברים למצב שקוף</b><span>לחץ `מצב שקוף` או הפעל `הפעל overlay שקוף.bat` כדי לראות חוטים מעל הדסקטופ.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="download" class="band">
+    <div class="wrap download">
+      <div class="download-box">
+        <h2>איך מורידים</h2>
+        <p>במחשב הזה יש חבילת ZIP מוכנה. אם שינית קבצים, הרץ את קובץ האריזה כדי ליצור גרסה חדשה ונקייה.</p>
+        <div class="actions">
+          <a class="btn primary" href="dist/BridgeOS-portable.zip">BridgeOS-portable.zip</a>
+          <a class="btn" href="יצירת חבילת הורדה.bat">צור חבילה מחדש</a>
+        </div>
+      </div>
+      <div class="checklist">
+        <div class="check"><span class="tick">✓</span><div><b>מה מעבירים?</b><br/>את קובץ ה-ZIP או את תיקיית BridgeOS בשלמותה.</div></div>
+        <div class="check"><span class="tick">✓</span><div><b>מה המשתמש מפעיל?</b><br/>פותחים את התיקייה ולוחצים `הפעל שולחן עבודה.bat`.</div></div>
+        <div class="check"><span class="tick">✓</span><div><b>מה לא נכנס לחבילה?</b><br/>הקובץ `bridge-config.json` לא נארז, כדי לא להעביר טוקנים אישיים.</div></div>
+        <code class="code">http://127.0.0.1:8787/</code>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <h2>שאלות קצרות</h2>
+        <p>הדברים שחשוב לדעת לפני שמשתמשים או שולחים למישהו אחר.</p>
+      </div>
+      <div class="faq">
+        <details open><summary>זה עובד בלי אינטרנט?</summary><p>כן. הממשק, השרת והמפה עובדים מקומית. GitHub, Netlify וקישורי דמו צריכים אינטרנט רק אם רוצים מדדים חיים.</p></details>
+        <details><summary>האם זה שומר מידע בענן?</summary><p>לא. הנתונים נשמרים בתיקיית BridgeOS בקבצי JSON/Markdown מקומיים.</p></details>
+        <details><summary>מה צריך להתקין?</summary><p>PowerShell קיים ב-Windows. בשביל overlay שקוף או MCP צריך Python ואת החבילות שמופיעות בקבצי requirements.</p></details>
+        <details><summary>איפה מתחילים?</summary><p>פתח את הכלי, לחץ על “רשימה”, בדוק שכל פרויקט מצביע לתיקייה הנכונה, ואז השתמש בסטטוס ובחוטים כדי לסדר את העבודה.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">BridgeOS · כלי מקומי למיפוי פרויקטים, קשרים ופעולות.</div>
+</footer>
+</body>
+</html>

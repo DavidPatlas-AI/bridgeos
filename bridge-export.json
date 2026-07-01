@@ -1,0 +1,145 @@
+{
+    "projects":  [
+                     {
+                         "tasksTotal":  4,
+                         "id":  "p1",
+                         "demo":  "",
+                         "goal":  "150 עובדים עברו הכשרת AI — חומרים, workshop, לוח זמנים מאושר",
+                         "github":  "",
+                         "progress":  65,
+                         "name":  "הזורעים בבינה",
+                         "tasksDone":  2,
+                         "nextTask":  "תיאום מועד עם מנהלי מחוז",
+                         "status":  "running",
+                         "thread":  [
+                                        "w1",
+                                        "w2"
+                                    ]
+                     },
+                     {
+                         "tasksTotal":  4,
+                         "id":  "p2",
+                         "demo":  "",
+                         "goal":  "מערכת ניהול מלאי פועלת ללא אינטרנט, מעקב החזרות לכל לקוח",
+                         "github":  "",
+                         "progress":  32,
+                         "name":  "מלאי משנת יוסף — Offline",
+                         "tasksDone":  1,
+                         "nextTask":  "inventory-manager.js",
+                         "status":  "waiting",
+                         "thread":  [
+                                        "w4",
+                                        "w1"
+                                    ]
+                     },
+                     {
+                         "tasksTotal":  3,
+                         "id":  "p3",
+                         "demo":  "",
+                         "goal":  "פרק ממצאים מוגש — 6,000 מילים, 4 נושאים, הגהה סופית",
+                         "github":  "",
+                         "progress":  82,
+                         "name":  "תזה — מורים חרדים ו-AI",
+                         "tasksDone":  1,
+                         "nextTask":  "חיזוק סעיף 3.2 — השוואה לבגן",
+                         "status":  "running",
+                         "thread":  [
+                                        "w2",
+                                        "w6"
+                                    ]
+                     },
+                     {
+                         "tasksTotal":  4,
+                         "id":  "p4",
+                         "demo":  "",
+                         "goal":  "תרגום שלם, נאמן למקור, מתאים לקהל יהודי דתי דובר רוסית",
+                         "github":  "",
+                         "progress":  44,
+                         "name":  "ספר הריבניצר — תרגום רוסי",
+                         "tasksDone":  1,
+                         "nextTask":  "עריכה — פרקים 1–4",
+                         "status":  "idle",
+                         "thread":  [
+                                        "w3",
+                                        "w4"
+                                    ]
+                     },
+                     {
+                         "tasksTotal":  3,
+                         "id":  "p5",
+                         "demo":  "https://math-haredim.netlify.app",
+                         "goal":  "פלטפורמה חיה — 90+ שיעורים, PWA, מבחנים",
+                         "github":  "DavidPatlas-AI/math-haredim",
+                         "progress":  90,
+                         "name":  "מתמטיקה לחרדים",
+                         "tasksDone":  2,
+                         "nextTask":  "ניטור צפיות Netlify",
+                         "status":  "running",
+                         "thread":  [
+                                        "w6",
+                                        "w4"
+                                    ]
+                     },
+                     {
+                         "tasksTotal":  3,
+                         "id":  "p6",
+                         "demo":  "https://teshuva-algorithm.netlify.app",
+                         "goal":  "שקיפות אלגוריתמית — דמו חי + ניטור צפיות",
+                         "github":  "DavidPatlas-AI/teshuva-algorithm",
+                         "progress":  75,
+                         "name":  "האלגוריתם שחזר בתשובה",
+                         "tasksDone":  2,
+                         "nextTask":  "Netlify Function analytics",
+                         "status":  "running",
+                         "thread":  [
+                                        "w2",
+                                        "w1"
+                                    ]
+                     },
+                     {
+                         "tasksTotal":  3,
+                         "id":  "p7",
+                         "demo":  "https://maslul-rechev-2026.netlify.app",
+                         "goal":  "קורס מכונאות — 19,000 רכבים, מוסך חי",
+                         "github":  "DavidPatlas-AI/maslul-rechev",
+                         "progress":  85,
+                         "name":  "מסלול רכב",
+                         "tasksDone":  2,
+                         "nextTask":  "עדכון תוכן 2026",
+                         "status":  "running",
+                         "thread":  [
+                                        "w1",
+                                        "w6"
+                                    ]
+                     }
+                 ],
+    "source":  "BRIDGE OS",
+    "worlds":  [
+                   {
+                       "id":  "w1",
+                       "name":  "מִשְׂרָד"
+                   },
+                   {
+                       "id":  "w2",
+                       "name":  "מֶחְקָר"
+                   },
+                   {
+                       "id":  "w3",
+                       "name":  "תַּרְגּוּם"
+                   },
+                   {
+                       "id":  "w4",
+                       "name":  "מִשְׁנַת יוֹסֵף"
+                   },
+                   {
+                       "id":  "w5",
+                       "name":  "צָבָא"
+                   },
+                   {
+                       "id":  "w6",
+                       "name":  "הוֹרָאָה"
+                   }
+               ],
+    "version":  "2.1",
+    "updated":  "2026-07-01T09:42:34.9609695+03:00"
+}

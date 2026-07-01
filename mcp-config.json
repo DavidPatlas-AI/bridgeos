@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "bridge-os": {
+      "command": "py",
+      "args": [
+        "-3.12",
+        "C:\\Users\\DAVID\\Desktop\\פרויקטים\\BridgeOS\\bridge-mcp-server.py"
+      ],
+      "env": {
+        "BRIDGE_PORT": "8787"
+      }
+    }
+  }
+}

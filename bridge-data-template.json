@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "meta": {
+    "title": "BRIDGE OS",
+    "tagline": "Universal workspace — configure your worlds",
+    "owner": "YOUR_NAME"
+  },
+  "worlds": [
+    { "id": "w1", "name": "Work", "color": "#4fb8a8", "verb": "turn data into decisions" },
+    { "id": "w2", "name": "Study", "color": "#9089d8", "verb": "ask the right question" },
+    { "id": "w3", "name": "Creative", "color": "#c75f73", "verb": "keep the voice" }
+  ],
+  "threads": [
+    ["w1", "w2", "work informs study"]
+  ],
+  "projects": [
+    {
+      "id": "p1",
+      "name": "My first project",
+      "goal": "Clear definition of done — one sentence",
+      "thread": ["w1", "w2"],
+      "path": "C:\\path\\to\\project\\folder",
+      "progress": 0,
+      "status": "idle",
+      "eta": null,
+      "insight": "",
+      "workOrder": [
+        { "id": "s1", "task": "First task (one session)", "done": false, "ai": false }
+      ],
+      "questions": [],
+      "answers": {}
+    }
+  ]
+}

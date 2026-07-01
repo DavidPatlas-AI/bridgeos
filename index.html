@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>BRIDGE OS · שולחן העבודה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#06080f;color:#e8ecf6;
+  font-family:'Heebo',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;
+  transition:background .6s}
+body.threads-mode{background:transparent!important}
+body.threads-mode #hud .brand,
+body.threads-mode #hud .hud-actions .btn:not(#toggle),
+body.threads-mode .pills{opacity:.22;transition:opacity .5s}
+body.threads-mode #toggle{opacity:1}
+body.threads-mode #hint{opacity:.55}
+body.threads-mode #intro{opacity:0!important}
+canvas{display:block;position:fixed;inset:0;z-index:0}
+#labels{position:fixed;inset:0;pointer-events:none;z-index:2}
+.label{position:fixed;transform:translate(-50%,-50%);font-family:'Frank Ruhl Libre',serif;
+  font-weight:700;font-size:17px;white-space:nowrap;text-shadow:0 2px 14px rgba(0,0,0,.8);
+  transition:opacity .4s}
+.thread-label{position:fixed;transform:translate(-50%,-50%);font-family:'Heebo',sans-serif;
+  font-weight:500;font-size:11.5px;line-height:1.4;text-align:center;max-width:150px;
+  color:#ffeab0;text-shadow:0 0 14px rgba(255,200,90,.55),0 2px 10px rgba(0,0,0,.85);
+  transition:opacity .35s;pointer-events:none;white-space:normal}
+body.threads-mode .world-label{font-size:12px;font-weight:600;opacity:.45!important}
+body.threads-mode #labels{z-index:6}
+body.threads-mode #reveal.show{opacity:.22;transition:opacity 2.5s ease}
+body.threads-mode #reveal.fade-out{opacity:0!important}
+body.threads-mode .thread-label{font-size:12px;max-width:168px;color:#fff0c8}
+body.overlay-mode{background:transparent!important}
+body.overlay-mode #hud .brand,
+body.overlay-mode #hud .hud-actions,
+body.overlay-mode .pills,
+body.overlay-mode #intro,
+body.overlay-mode #yamlbox,
+body.overlay-mode #panel,
+body.overlay-mode #scrim,
+body.overlay-mode #reveal,
+body.overlay-mode .hint-wrap{display:none!important}
+body.overlay-mode #controls{bottom:10px;opacity:.65;pointer-events:none}
+body.overlay-mode #toggle{pointer-events:auto;font-size:11px;padding:7px 16px}
+body.overlay-mode #hud{pointer-events:none}
+body.overlay-mode #statsBar{display:none!important}
+
+/* HUD */
+#hud{position:fixed;top:0;right:0;left:0;z-index:10;pointer-events:none;
+  padding:16px 18px 0;display:flex;flex-direction:column;gap:8px}
+.hud-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.brand{pointer-events:auto}
+.sys{font-size:10px;letter-spacing:.28em;color:#d9a441;font-weight:500}
+.ver-chip{font-size:9px;letter-spacing:.12em;color:#6b7596;font-family:'JetBrains Mono',monospace;margin-top:3px}
+.sync-row{display:flex;gap:8px;align-items:center;padding:8px 10px;margin-bottom:6px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;font-size:12px}
+.sync-row b{flex:1;min-width:0}
+.sync-row span{font-size:10px;color:#52c4a0;font-family:'JetBrains Mono',monospace}
+.sync-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.h1{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:clamp(20px,5vw,32px);
+  color:#f0f4ff;line-height:1.1;margin-top:4px}
+.tag{font-size:11.5px;color:#6b7596;font-weight:300;margin-top:4px;max-width:320px;line-height:1.5}
+.hud-actions{display:flex;gap:8px;flex-wrap:wrap;pointer-events:auto}
+.btn{font-family:inherit;font-size:12px;font-weight:600;padding:8px 14px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);background:rgba(11,15,29,.85);color:#c8d0e8;
+  cursor:pointer;backdrop-filter:blur(8px);transition:.2s}
+.btn:hover{border-color:#d9a44188;color:#fff}
+.btn-icon{width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.btn-gold{background:#d9a441;color:#0a0e1c;border:none;box-shadow:0 6px 20px rgba(217,164,65,.25)}
+.btn-gold:hover{filter:brightness(1.06)}
+.pills{display:flex;flex-wrap:wrap;gap:6px;pointer-events:auto}
+.pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;
+  border:1px solid;font-size:12px;font-family:'Frank Ruhl Libre',serif;font-weight:700;
+  background:rgba(11,15,29,.7);backdrop-filter:blur(6px);cursor:pointer}
+.pdot{width:6px;height:6px;border-radius:6px}
+
+#intro{position:fixed;top:50%;left:50%;transform:translate(-50%,-120px);z-index:3;
+  font-size:12px;color:#5d6680;text-align:center;pointer-events:none;transition:opacity 1.2s}
+#reveal{position:fixed;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;pointer-events:none;opacity:0;transition:opacity 1s;padding:0 24px}
+#reveal.show{opacity:1}
+#reveal .big{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:clamp(28px,8vw,48px);color:#fff4d6}
+#reveal .small{font-family:'Frank Ruhl Libre',serif;font-size:clamp(15px,4vw,20px);color:#e0b04a;margin-top:12px;font-style:italic}
+
+#controls{position:fixed;bottom:0;right:0;left:0;z-index:10;padding:14px 16px calc(18px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+#controls button,#controls .hint-wrap{pointer-events:auto}
+#toggle{font-family:inherit;font-size:13px;font-weight:600;color:#0a0e1c;background:#d9a441;
+  border:none;border-radius:999px;padding:11px 22px;cursor:pointer;box-shadow:0 8px 28px rgba(217,164,65,.28)}
+#toggle.on{background:transparent;color:#d9a441;border:1px solid rgba(217,164,65,.5);box-shadow:none}
+#hint{font-size:11px;color:#5d6680;font-weight:300}
+
+/* Panel */
+#scrim{position:fixed;inset:0;background:rgba(5,7,13,.5);backdrop-filter:blur(3px);
+  opacity:0;pointer-events:none;transition:opacity .35s;z-index:20}
+#scrim.show{opacity:1;pointer-events:auto}
+#panel{position:fixed;z-index:21;background:linear-gradient(180deg,#0f1730 0%,#0a1022 100%);
+  border:1px solid rgba(255,255,255,.08);box-shadow:0 -24px 70px rgba(0,0,0,.55);
+  display:flex;flex-direction:column;overflow:hidden;transition:transform .45s cubic-bezier(.2,.9,.25,1)}
+#panel.sheet{right:0;left:0;bottom:0;max-height:82vh;border-radius:24px 24px 0 0;transform:translateY(110%)}
+#panel.sheet.show{transform:translateY(0)}
+#panel.desk{top:0;bottom:0;right:0;left:auto;width:min(420px,100vw);transform:translateX(110%);border-radius:0}
+#panel.desk.show{transform:translateX(0)}
+.panel-scroll{overflow-y:auto;flex:1;padding:18px 20px 24px}
+.bar{width:44px;height:4px;border-radius:4px;margin:0 auto 14px}
+.close{position:absolute;top:12px;left:14px;background:none;border:none;color:#6b7596;font-size:16px;cursor:pointer;z-index:2}
+.ptitle{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:28px;text-align:center;line-height:1.1}
+.psub{font-size:12px;color:#8b93ab;text-align:center;margin-top:5px}
+.pverb{font-family:'Frank Ruhl Libre',serif;font-style:italic;font-size:17px;color:#e6dcc4;
+  text-align:center;padding:12px 0 14px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:14px}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.stat{background:rgba(255,255,255,.03);border-radius:10px;padding:10px 6px;text-align:center}
+.stat b{display:block;font-family:'JetBrains Mono',monospace;font-size:18px}
+.stat span{font-size:9px;color:#5d6680;letter-spacing:.04em}
+
+.card{background:#0b0f1d;border:1px solid rgba(255,255,255,.07);border-radius:14px;
+  margin-bottom:12px;overflow:hidden;transition:.3s}
+.card.open{border-color:rgba(255,255,255,.14)}
+.tbar{height:3px}
+.chead{padding:12px 14px 8px;display:flex;gap:10px;align-items:flex-start}
+.chead h3{flex:1;font-family:'Frank Ruhl Libre',serif;font-size:16px;font-weight:700;line-height:1.25}
+.sdot{width:7px;height:7px;border-radius:7px;flex-shrink:0;margin-top:5px}
+.slabel{font-size:10px;font-weight:700;letter-spacing:.06em}
+.goal{font-size:12px;color:#8892a8;line-height:1.6;padding:0 14px 10px}
+.ring{flex-shrink:0}
+.foot{display:flex;gap:8px;padding:10px 14px 12px;border-top:1px solid rgba(255,255,255,.05);flex-wrap:wrap}
+.foot button{flex:1;min-width:90px;font-family:inherit;font-size:11px;font-weight:700;
+  padding:8px 10px;border-radius:999px;cursor:pointer;border:1px solid;transition:.2s}
+.b-expand{background:none;border-color:rgba(255,255,255,.12)!important;color:#8b93ab!important}
+.b-agent{background:transparent}
+.b-term{background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.35)!important;color:#60a5fa!important}
+
+.qblock{margin:0 12px 12px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.22);
+  border-radius:10px;padding:11px}
+.qtitle{font-size:10px;font-weight:700;color:#f59e0b;letter-spacing:.1em;margin-bottom:8px}
+.qtext{font-size:12.5px;color:#fcd34d;line-height:1.5;margin-bottom:6px}
+.qrow{display:flex;gap:6px}
+.qinput{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  border-radius:7px;padding:7px 10px;color:#e8ecf6;font-size:12px;outline:none;font-family:inherit}
+.qbtn{background:rgba(245,158,11,.13);border:1px solid rgba(245,158,11,.3);border-radius:7px;
+  padding:0 10px;color:#f59e0b;cursor:pointer}
+
+.wo{padding:0 14px 10px}
+.wotitle{font-size:9.5px;letter-spacing:.2em;color:#3d4a70;font-weight:600;margin-bottom:8px}
+.step{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer}
+.chk{width:15px;height:15px;border-radius:4px;border:1.5px solid;margin-top:2px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:900}
+.steptxt{font-size:12.5px;line-height:1.45;flex:1}
+.stepwhy{font-size:10.5px;color:#60a5fa;margin-top:2px}
+.insight{display:flex;gap:8px;margin:10px 0;background:rgba(255,255,255,.025);border-radius:8px;padding:8px 10px}
+.insighttxt{font-size:12px;color:#9ca3af;line-height:1.5}
+
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#0f1730;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 18px;
+  font-size:13px;opacity:0;transition:.35s;z-index:50;pointer-events:none;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+#yamlbox{position:fixed;left:16px;right:16px;bottom:80px;max-height:40vh;z-index:15;
+  background:#0b0f1d;border:1px solid rgba(255,255,255,.08);border-radius:12px;
+  display:none;flex-direction:column;overflow:hidden}
+#yamlbox.show{display:flex}
+#yamlbox pre{padding:12px;font-size:10.5px;line-height:1.8;color:#52c4a0;font-family:'JetBrains Mono',monospace;
+  overflow:auto;direction:ltr;text-align:left;flex:1}
+
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:10px;letter-spacing:.15em;color:#6b7596;margin-bottom:5px}
+.form-input,.form-select{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:9px 11px;color:#e8ecf6;font-size:13px;font-family:inherit;outline:none}
+.form-input:focus,.form-select:focus{border-color:#d9a44188}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-create{width:100%;margin-top:8px;padding:11px;border:none;border-radius:999px;
+  background:#d9a441;color:#0a0e1c;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+.editblock{margin:0 14px 12px;padding:12px;background:rgba(255,255,255,.02);border-radius:10px;
+  border:1px solid rgba(255,255,255,.06)}
+.editblock label{display:block;font-size:10px;color:#6b7596;margin-bottom:5px;letter-spacing:.1em}
+.path-input{width:100%;direction:ltr;text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:7px;
+  padding:8px 10px;color:#a8b4d0;margin-bottom:8px}
+.btn-sm{font-size:10px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+  background:transparent;color:#8b93ab;cursor:pointer;font-family:inherit;margin-left:6px}
+.btn-sm:hover{border-color:#d9a44166;color:#e8ecf6}
+
+.metrics{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px}
+.mbadge{font-size:10px;padding:4px 9px;border-radius:999px;border:1px solid;
+  font-family:'JetBrains Mono',monospace;letter-spacing:.02em;text-decoration:none;
+  display:inline-flex;align-items:center;gap:4px}
+.mbadge.live{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.35);color:#34d399}
+.mbadge.down{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.3);color:#f87171}
+.mbadge.gh{background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.3);color:#93c5fd}
+.mbadge.muted{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08);color:#6b7596}
+.mbadge.nf{background:rgba(0,214,143,.08);border-color:rgba(0,214,143,.28);color:#00d68f}
+
+.world-row{display:grid;grid-template-columns:1fr 1fr 44px;gap:8px;align-items:center;margin-bottom:10px}
+.world-row input[type=color]{width:44px;height:36px;border:none;border-radius:8px;cursor:pointer;padding:0}
+.suggest{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:10px;
+  padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:center}
+.suggest-info{flex:1;min-width:0}
+.suggest-info b{display:block;font-size:13px;margin-bottom:3px}
+.suggest-info span{font-size:10px;color:#6b7596;font-family:'JetBrains Mono',monospace;direction:ltr;display:block;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+#dashStrip{display:flex;flex-wrap:wrap;gap:6px;pointer-events:auto;margin-top:2px}
+.dchip{font-size:10px;padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
+  background:rgba(11,15,29,.65);color:#8b93ab;font-family:'JetBrains Mono',monospace}
+.dchip b{color:#e8ecf6;font-weight:600}
+.dchip.live b{color:#34d399}
+.dchip.nf b{color:#7eb8ff}
+
+.thread-row{display:grid;grid-template-columns:1fr 1fr 32px;gap:8px;margin-bottom:8px;align-items:center}
+.thread-row input{grid-column:1/3}
+.thread-del{background:none;border:1px solid rgba(255,255,255,.1);color:#6b7596;border-radius:8px;
+  width:32px;height:32px;cursor:pointer;font-size:12px;padding:0;grid-row:1}
+.thread-del:hover{color:#e0897a;border-color:#e0897a55}
+
+@media(min-width:700px){
+  #panel.sheet{right:auto;left:20px;bottom:20px;width:400px;max-height:calc(100vh - 40px);
+    border-radius:20px;transform:translateY(140%)}
+  #panel.sheet.show{transform:translateY(0)}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<div id="labels"></div>
+<div id="intro">גרור לסיבוב · צבוט לזום · הקש על עולם או פרויקט</div>
+
+<div id="hud">
+  <div class="hud-top">
+    <div class="brand">
+      <div class="sys">BRIDGE OS · מערכת הפעלה אנושית</div>
+      <div class="ver-chip" id="verChip"></div>
+      <div class="h1">שולחן העבודה</div>
+      <div class="tag">אוניברסלי — הגדר עולמות, חבר פרויקטים, פתח שיחה בטרמינל לכל אחד</div>
+    </div>
+    <div class="hud-actions">
+      <button class="btn" id="btnAdd">+ פרויקט</button>
+      <button class="btn" id="btnWorlds">עולמות</button>
+      <button class="btn" id="btnThreads">חוטים</button>
+      <button class="btn" id="btnPortfolio">פורטפוליו</button>
+      <button class="btn" id="btnMcp" title="MCP manifest">MCP</button>
+      <button class="btn" id="btnDesk">📋 רשימה</button>
+      <button class="btn" id="btnYaml">YAML</button>
+      <button class="btn" id="btnMetrics" title="רענן GitHub + לייב">📡</button>
+      <button class="btn" id="btnConfig" title="הגדרות">⚙</button>
+      <button class="btn" id="btnHealth" title="בדיקת בריאות">בדיקה</button>
+      <button class="btn btn-icon" id="btnHelp" title="מדריך והורדה">?</button>
+      <button class="btn btn-gold" id="btnSave">שמור</button>
+    </div>
+  </div>
+  <div class="pills" id="pills"></div>
+  <div id="dashStrip"></div>
+</div>
+
+<div id="reveal">
+  <div class="big">אתה החוט שמחבר</div>
+  <div class="small">ששת העולמות הם פעולה אחת — לתרגם בין עולמות</div>
+</div>
+
+<div id="controls">
+  <button id="toggle">מצב שקוף — רק חוטים</button>
+  <div class="hint-wrap"><span id="hint">הקש על עולם · כל פרויקט → שיחה בטרמינל</span></div>
+</div>
+
+<div id="yamlbox">
+  <div style="display:flex;justify-content:space-between;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
+    <span style="font-size:11px;color:#8892a8">bridge-state.yaml</span>
+    <button id="btnYamlDl" style="font-size:11px;background:none;border:1px solid rgba(255,255,255,.12);
+      color:#52c4a0;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit">הורד</button>
+  </div>
+  <pre id="yamlpre"></pre>
+</div>
+<div id="scrim"></div>
+<div id="panel" class="sheet">
+  <button class="close" id="pclose">✕</button>
+  <div class="panel-scroll" id="panelBody"></div>
+</div>
+<div id="toast"></div>
+
+<script src="lib/three.min.js"></script>
+<script>
+const API = (location.protocol === 'http:' && location.hostname === '127.0.0.1') ? '' : null;
+const PORT = 8787;
+let saveTimer = null;
+const STATUS = { live:'#5ec98b', wip:'#e0b04a', done:'#7aa7e0', ongoing:'#9aa0ad' };
+const STATUS_CFG = {
+  idle:{label:'ממתין',color:'#4b5680'},
+  thinking:{label:'מחשב...',color:'#60a5fa'},
+  running:{label:'פועל',color:'#34d399'},
+  waiting:{label:'שאלות פתוחות',color:'#f59e0b'},
+  done:{label:'הושלם ✓',color:'#6ee7b7'},
+};
+
+let DATA = null;
+let BRIDGE_ROOT = 'C:\\Users\\DAVID\\Desktop\\BridgeOS';
+let expanded = null;
+let focusedWorld = null;
+let reveal = false;
+const OVERLAY = new URLSearchParams(location.search).get('overlay') === '1';
+let deskMode = false;
+let loading = null;
+let answerInputs = {};
+let METRICS = null;
+let metricsTimer = null;
+
+// ── Data load / save ───────────────────────────────────────
+async function loadData(){
+  try{
+    const infoUrl = API !== null ? '/api/info' : `http://127.0.0.1:${PORT}/api/info`;
+    const ir = await fetch(infoUrl);
+    if(ir.ok){
+      const info = await ir.json();
+      if(info.root) BRIDGE_ROOT = info.root.replace(/\//g,'\\');
+      const vc=document.getElementById('verChip');
+      if(vc) vc.textContent=`v${info.version||'?'} · :${info.port||PORT}${info.portfolio?' · portfolio':''}${info.netlify?' · NF':''}`;
+    }
+  }catch(_){}
+  try{
+    const url = API !== null ? '/api/data' : `http://127.0.0.1:${PORT}/api/data`;
+    const r = await fetch(url);
+    if(!r.ok) throw new Error('fetch');
+    DATA = await r.json();
+  }catch(e){
+    toast('הפעל קודם: שולחן עבודה.bat על שולחן העבודה', true);
+    DATA = {worlds:[],threads:[],projects:[],meta:{}};
+    return;
+  }
+  const saved = localStorage.getItem('bridge-os-state');
+  if(saved){
+    try{
+      const o = JSON.parse(saved);
+      if(o.savedAt){
+        const fileTime = DATA._savedAt || 0;
+        if(o.savedAt >= fileTime){
+          if(o.projects) DATA.projects = o.projects;
+          if(o.worlds?.length) DATA.worlds = o.worlds;
+          if(o.threads?.length) DATA.threads = o.threads;
+        }
+      }
+    }catch(_){}
+  }
+  if(typeof THREE === 'undefined'){
+    toast('חסר three.min.js — הפעל דרך שולחן עבודה.bat', true);
+    return;
+  }
+  init();
+  loadMetrics();
+  loadDashboard();
+}
+
+function persistLocal(){
+  localStorage.setItem('bridge-os-state', JSON.stringify({
+    projects: DATA.projects, worlds: DATA.worlds, threads: DATA.threads, savedAt: Date.now()
+  }));
+}
+
+function scheduleSave(showToast){
+  persistLocal();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>saveData(showToast), 400);
+}
+
+async function loadMetrics(refresh=false){
+  try{
+    const q = refresh ? '?refresh=1' : '';
+    const url = API !== null ? `/api/metrics${q}` : `http://127.0.0.1:${PORT}/api/metrics${q}`;
+    const r = await fetch(url);
+    if(!r.ok) return;
+    METRICS = await r.json();
+    renderDesk();
+    if(expanded) renderProjectPanel(expanded);
+    else if(focusedWorld) showWorldProjects(focusedWorld);
+  }catch(_){}
+}
+
+function formatCommitDate(iso){
+  if(!iso) return '';
+  try{
+    const d=new Date(iso);
+    const diff=Math.floor((Date.now()-d)/86400000);
+    if(diff===0) return 'היום';
+    if(diff===1) return 'אתמול';
+    if(diff<7) return `לפני ${diff} ימים`;
+    return d.toLocaleDateString('he-IL',{day:'numeric',month:'short'});
+  }catch(_){ return ''; }
+}
+
+function metricsHtml(pid){
+  if(!METRICS?.projects?.[pid]) return '';
+  const m=METRICS.projects[pid];
+  let html='<div class="metrics">';
+  if(m.demo){
+    if(m.demo.live){
+      html+=`<a class="mbadge live" href="${esc(m.demo.url||'#')}" target="_blank" rel="noopener">● לייב ${m.demo.ms?m.demo.ms+'ms':''}</a>`;
+    }else{
+      html+=`<span class="mbadge down">○ לא זמין</span>`;
+    }
+  }
+  if(m.github?.ok){
+    const gh=m.github;
+    const when=formatCommitDate(gh.lastCommit?.date);
+    const label=when?`GH · ${when}`:'GitHub';
+    html+=`<a class="mbadge gh" href="${esc(gh.url||'#')}" target="_blank" rel="noopener" title="${esc(gh.lastCommit?.message||'')}">${label}</a>`;
+    if(gh.openIssues>0) html+=`<span class="mbadge muted">${gh.openIssues} issues</span>`;
+    if(gh.stars>0) html+=`<span class="mbadge muted">★ ${gh.stars}</span>`;
+  }
+  if(m.netlify?.ok){
+    const when=formatCommitDate(m.netlify.lastDeploy?.date);
+    const pv30=m.netlify.pageviews30d??m.netlify.pageviews;
+    const pv7=m.netlify.pageviews7d;
+    let nfLabel='NF';
+    let nfTitle=m.netlify.site||'';
+    if(pv30!=null){
+      nfLabel+=` · ${pv30} צפיות/30י`;
+      if(pv7!=null) nfTitle+=` · 7d: ${pv7}`;
+    }else if(m.netlify.analyticsEnabled===false){
+      nfLabel+=' · ללא Analytics';
+      nfTitle='הפעל Netlify Analytics בתוכנית האתר';
+    }else if(when){
+      nfLabel+=` · ${when}`;
+    }
+    html+=`<span class="mbadge nf" title="${esc(nfTitle)}">${nfLabel}</span>`;
+  }else if(m.netlify?.skipped){
+    html+=`<span class="mbadge muted" title="הוסף netlify.token ל-bridge-config.json">NF · אין token</span>`;
+  }
+  html+='</div>';
+  return html;
+}
+
+async function saveData(showToast=true){
+  if(!DATA || !DATA.worlds || !DATA.projects) return;
+  persistLocal();
+  try{
+    const url = API !== null ? '/api/data' : `http://127.0.0.1:${PORT}/api/data`;
+    const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(DATA)});
+    if(!r.ok) throw new Error('save failed');
+    if(showToast) toast('נשמר ✓');
+    loadDashboard();
+  }catch(e){
+    if(showToast) toast('נשמר מקומית בדפדפן');
+  }
+}
+
+// ── Local agent (no API) ───────────────────────────────────
+function runLocalAgent(proj){
+  const pending = proj.workOrder.filter(s=>!s.done);
+  const done = proj.workOrder.filter(s=>s.done);
+  const questions = (proj.questions||[]).slice(0,2);
+  let nextSteps = [];
+  if(!pending.length){
+    nextSteps = [{task:'הגדר יעד חדש או סגור את הפרויקט', why:'כל המשימות הושלמו'}];
+  }
+  let insight = proj.insight || '';
+  if(pending.length) insight = `הבא: ${pending[0].task}. ${done.length}/${proj.workOrder.length} הושלמו.`;
+  if(questions.length) insight = 'יש שאלות שחוסמות — ענה לפני שממשיכים לבנות.';
+  return {nextSteps, questions: questions.length ? questions : [], insight, eta: proj.eta||'סשן אחד'};
+}
+
+function applyAgentResult(pid, parsed){
+  setProjects(ps=>ps.map(p=>{
+    if(p.id!==pid) return p;
+    const kept = p.workOrder.filter(t=>t.done);
+    const newTasks = (parsed.nextSteps||[]).map((s,i)=>({
+      id:`ai_${Date.now()}_${i}`, task:s.task, done:false, ai:true, why:s.why
+    }));
+    const newOrder = [...kept, ...newTasks.filter(nt=>!kept.some(k=>k.task===nt.task))];
+    const d = newOrder.filter(s=>s.done).length;
+    return {
+      ...p,
+      status: (parsed.questions||[]).length ? 'waiting' : 'running',
+      workOrder: newOrder,
+      questions: parsed.questions?.length ? parsed.questions : p.questions,
+      insight: parsed.insight||p.insight,
+      eta: parsed.eta||p.eta,
+      progress: d/Math.max(newOrder.length,1),
+    };
+  }));
+}
+
+function setProjects(fn, persist=true){
+  DATA.projects = fn(DATA.projects);
+  refreshBrain();
+  renderDesk();
+  if(expanded) renderProjectPanel(expanded);
+  else if(focusedWorld) showWorldProjects(focusedWorld);
+  if(persist) scheduleSave(false);
+}
+
+function setWorlds(fn, persist=true){
+  DATA.worlds = fn(DATA.worlds);
+  refreshBrain();
+  renderDesk();
+  if(persist) scheduleSave(false);
+}
+
+function setThreads(fn, persist=true){
+  DATA.threads = fn(DATA.threads || []);
+  refreshBrain();
+  renderDesk();
+  if(persist) scheduleSave(false);
+}
+
+async function loadDashboard(){
+  try{
+    const url=API!==null?'/api/dashboard':`http://127.0.0.1:${PORT}/api/dashboard`;
+    const r=await fetch(url);
+    if(!r.ok) return;
+    const d=await r.json();
+    const el=document.getElementById('dashStrip');
+    if(!el) return;
+    let chips=`
+      <span class="dchip"><b>${d.projects}</b> פרויקטים</span>
+      <span class="dchip"><b>${d.active}</b> פעילים</span>
+      <span class="dchip"><b>${d.threads}</b> חוטים</span>
+      <span class="dchip live"><b>${d.liveSites||0}</b> לייב</span>`;
+    if(d.netlifyConfigured&&d.totalPageviews30d>0){
+      chips+=`<span class="dchip nf"><b>${d.totalPageviews30d}</b> צפיות/30י</span>`;
+    }else if(!d.netlifyConfigured){
+      chips+=`<span class="dchip" title="bridge-config.json → netlify.token">NF · הגדר token</span>`;
+    }
+    el.innerHTML=chips;
+    loadEcosystem();
+  }catch(_){}
+}
+
+function worldOpts(selected){
+  return DATA.worlds.map(w=>`<option value="${w.id}"${w.id===selected?' selected':''}>${esc(w.name)}</option>`).join('');
+}
+
+function showThreadEditor(){
+  const rows=(DATA.threads||[]).map(t=>`
+    <div class="thread-row">
+      <select class="form-select" data-ta>${worldOpts(t[0])}</select>
+      <select class="form-select" data-tb>${worldOpts(t[1])}</select>
+      <input class="form-input" data-tl value="${esc(t[2]||'')}" placeholder="תווית החוט בעברית"/>
+      <button class="btn-sm thread-del" title="מחק">✕</button>
+    </div>`).join('');
+  document.getElementById('panelBody').innerHTML=`
+    <div class="bar" style="background:#f0c869"></div>
+    <div class="ptitle" style="color:#f0c869">רשת החוטים</div>
+    <p class="pverb" style="border:none">${(DATA.threads||[]).length} חוטים · מצב שקוף (T)</p>
+    <div id="threadRows">${rows}</div>
+    <button class="btn-sm" id="addThreadBtn" style="margin:8px 0">+ חוט</button>
+    <button class="btn-create" id="saveThreadsBtn">שמור חוטים</button>`;
+  openPanel('sheet');
+  document.getElementById('addThreadBtn').onclick=()=>{
+    const div=document.createElement('div');
+    div.className='thread-row';
+    const a=DATA.worlds[0]?.id||'';
+    const b=DATA.worlds[1]?.id||a;
+    div.innerHTML=`<select class="form-select" data-ta>${worldOpts(a)}</select>
+      <select class="form-select" data-tb>${worldOpts(b)}</select>
+      <input class="form-input" data-tl placeholder="תווית החוט בעברית"/>
+      <button class="btn-sm thread-del" title="מחק">✕</button>`;
+    div.querySelector('.thread-del').onclick=()=>div.remove();
+    document.getElementById('threadRows').appendChild(div);
+  };
+  document.querySelectorAll('.thread-del').forEach(btn=>btn.onclick=()=>btn.closest('.thread-row')?.remove());
+  document.getElementById('saveThreadsBtn').onclick=()=>{
+    const threads=[];
+    document.querySelectorAll('#threadRows .thread-row').forEach(row=>{
+      const a=row.querySelector('[data-ta]')?.value;
+      const b=row.querySelector('[data-tb]')?.value;
+      const l=row.querySelector('[data-tl]')?.value||'';
+      if(a&&b&&a!==b) threads.push([a,b,l.trim()]);
+    });
+    setThreads(()=>threads);
+    loadDashboard();
+    toast('חוטים נשמרו ✓');
+  };
+}
+
+async function openMcpManifest(){
+  try{
+    const url=API!==null?'/api/mcp':`http://127.0.0.1:${PORT}/api/mcp`;
+    const r=await fetch(url);
+    if(!r.ok) throw new Error();
+    const j=await r.json();
+    const text=JSON.stringify(j,null,2);
+    document.getElementById('yamlpre').textContent=text;
+    document.getElementById('yamlbox').querySelector('span').textContent='bridge-mcp.json';
+    document.getElementById('yamlbox').classList.add('show');
+    toast('MCP: bridge-mcp-server.py + mcp-config.json');
+  }catch(_){
+    toast('הפעל דרך שולחן עבודה.bat',true);
+  }
+}
+
+function showWorldEditor(){
+  let rows=DATA.worlds.map(w=>`
+    <div class="world-row" data-wid="${w.id}">
+      <input class="form-input" data-wn="${w.id}" value="${esc(w.name)}" placeholder="שם עולם"/>
+      <input class="form-input" data-wv="${w.id}" value="${esc(w.verb||'')}" placeholder="פועל"/>
+      <input type="color" data-wc="${w.id}" value="${w.color}" title="צבע"/>
+    </div>`).join('');
+  document.getElementById('panelBody').innerHTML=`
+    <div class="bar" style="background:#9089d8"></div>
+    <div class="ptitle" style="color:#9089d8">ששת העולמות</div>
+    <p class="pverb" style="border:none">שם · פועל · צבע — נשמר למפה ול-YAML</p>
+    ${rows}
+    <button class="btn-create" id="saveWorldsBtn">שמור עולמות</button>`;
+  openPanel('sheet');
+  document.getElementById('saveWorldsBtn').onclick=()=>{
+    setWorlds(ws=>ws.map(w=>{
+      const n=document.querySelector(`[data-wn="${w.id}"]`);
+      const v=document.querySelector(`[data-wv="${w.id}"]`);
+      const c=document.querySelector(`[data-wc="${w.id}"]`);
+      return{...w,name:(n?.value||w.name).trim(),verb:(v?.value||w.verb||'').trim(),color:c?.value||w.color};
+    }));
+    toast('עולמות נשמרו ✓');
+  };
+}
+
+async function showPortfolioPanel(){
+  try{
+    const url=API!==null?'/api/sync-portfolio/preview?direction=both':`http://127.0.0.1:${PORT}/api/sync-portfolio/preview?direction=both`;
+    const r=await fetch(url);
+    if(!r.ok) throw new Error();
+    const j=await r.json();
+    let html=`<div class="bar" style="background:#52c4a0"></div>
+      <div class="ptitle" style="color:#52c4a0">פורטפוליו</div>
+      <p class="pverb" style="border:none">${j.catalogCount||0} פריטים · תצוגה מקדימה</p>`;
+    if(j.pull?.length){
+      html+=`<p style="font-size:11px;color:#8b93ab;margin:8px 0 4px">יימשך ל-Bridge:</p>`;
+      j.pull.forEach(p=>{ html+=`<div class="sync-row"><b>${esc(p.name)}</b><span>${esc((p.fields||[]).join(', '))}</span></div>`; });
+    }
+    if(j.push?.length){
+      html+=`<p style="font-size:11px;color:#8b93ab;margin:8px 0 4px">יידחף ל-portfolio:</p>`;
+      j.push.forEach(p=>{ html+=`<div class="sync-row"><b>${esc(p.name)}</b><span>${esc((p.fields||[]).join(', '))}</span></div>`; });
+    }
+    if(!j.pull?.length&&!j.push?.length) html+=`<p style="text-align:center;color:#6b7596;padding:12px 0">הכל מסונכרן ✓</p>`;
+    if(j.suggestions?.length) html+=`<p style="font-size:11px;color:#f59e0b;margin-top:8px">${j.suggestions.length} לייב לא ב-Bridge</p>`;
+    html+=`<div class="sync-actions">
+      <button class="btn-sm" id="syncBoth">סנכרן הכל</button>
+      <button class="btn-sm" id="syncFrom">← משך</button>
+      <button class="btn-sm" id="syncTo">דחף →</button>
+    </div>`;
+    document.getElementById('panelBody').innerHTML=html;
+    openPanel('sheet');
+    document.getElementById('syncBoth').onclick=()=>syncPortfolio('both',true);
+    document.getElementById('syncFrom').onclick=()=>syncPortfolio('from',true);
+    document.getElementById('syncTo').onclick=()=>syncPortfolio('to',true);
+  }catch(_){
+    toast('portfolio.html לא נמצא',true);
+  }
+}
+
+async function syncPortfolio(direction='both',fromPanel=false){
+  toast('מסנכרן דו-כיווני...');
+  try{
+    const base=API!==null?'/api/sync-portfolio':`http://127.0.0.1:${PORT}/api/sync-portfolio`;
+    const url=`${base}?direction=${encodeURIComponent(direction)}`;
+    const r=await fetch(url,{method:'POST'});
+    if(!r.ok) throw new Error('sync failed');
+    const j=await r.json();
+    const pulled=j.pulled||j.updated||[];
+    const pushed=(j.pushed||[]).map(p=>p.bridgeId||p);
+    if(pulled.length||pushed.length){
+      const dr=await fetch(API!==null?'/api/data':`http://127.0.0.1:${PORT}/api/data`);
+      if(dr.ok) DATA=await dr.json();
+      refreshBrain(); renderDesk();
+      if(expanded) renderProjectPanel(expanded);
+      loadMetrics(true);
+      const parts=[];
+      if(pulled.length) parts.push(`נמשך: ${pulled.join(', ')}`);
+      if(pushed.length){
+        const detail=(j.pushed||[]).map(p=>{
+          const f=(p.fields||[]).join('+');
+          return f?`${p.bridgeId}(${f})`:p.bridgeId;
+        }).join(', ');
+        parts.push(`נדחף: ${detail||pushed.join(', ')}`);
+      }
+      if(j.backup) parts.push(`גיבוי: ${j.backup.split(/[/\\]/).pop()}`);
+      toast(parts.join(' · ') || 'סונכרן ✓');
+    }else toast('אין עדכונים — הכל מסונכרן');
+    if(j.suggestions?.length&&!fromPanel) showPortfolioSuggestions(j.suggestions);
+    else if(fromPanel) setTimeout(showPortfolioPanel,600);
+  }catch(e){
+    toast('portfolio.html לא נמצא או השרת לא רץ',true);
+  }
+}
+
+async function openFolder(pid){
+  try{
+    const url=API!==null?`/api/folder/${pid}`:`http://127.0.0.1:${PORT}/api/folder/${pid}`;
+    const r=await fetch(url);
+    if(!r.ok) throw new Error();
+    const j=await r.json();
+    toast(`נפתח: ${(j.path||'').split(/[/\\]/).pop()}`);
+  }catch(_){
+    toast('לא ניתן לפתוח תיקייה',true);
+  }
+}
+
+function showPortfolioSuggestions(items){
+  let html=`<div class="bar" style="background:#52c4a0"></div>
+    <div class="ptitle" style="color:#52c4a0">מפורטפוליו</div>
+    <p class="pverb" style="border:none">${items.length} פרויקטים לייב שלא ב-Bridge OS</p>`;
+  items.forEach(s=>{
+    html+=`<div class="suggest">
+      <div class="suggest-info"><b>${esc(s.name)}</b><span>${esc(s.demo||'')}</span></div>
+      <button class="btn-sm" data-import="${esc(s.portfolioId)}">+ הוסף</button>
+    </div>`;
+  });
+  document.getElementById('panelBody').innerHTML=html;
+  openPanel('sheet');
+  document.querySelectorAll('[data-import]').forEach(b=>{
+    b.onclick=()=>{
+      const s=items.find(x=>x.portfolioId===b.dataset.import);
+      if(s) importFromPortfolio(s);
+    };
+  });
+}
+
+function importFromPortfolio(s){
+  const id=newProjectId();
+  const proj={
+    id, name:s.name||'פרויקט חדש', goal:(s.desc||s.name||'').trim(),
+    thread:['w1','w2'], path:BRIDGE_ROOT,
+    github:s.github||undefined, demo:s.demo||undefined,
+    progress:0, status:'running', eta:null,
+    insight:`לייב — ${(s.demo||'').replace(/^https?:\/\//,'')}`,
+    workOrder:[{id:'s1',task:'סקירה ראשונית מהפורטפוליו',done:false,ai:false}],
+    questions:[], answers:{}
+  };
+  DATA.projects.push(proj);
+  expanded=id;
+  refreshBrain(); renderDesk(); renderProjectPanel(id);
+  scheduleSave(true);
+  toast(`נוסף: ${s.name}`);
+}
+
+function newProjectId(){
+  let n=DATA.projects.length+1;
+  let id='p'+n;
+  while(DATA.projects.some(p=>p.id===id)){ n++; id='p'+n; }
+  return id;
+}
+
+function showAddProject(){
+  const opts=DATA.worlds.map(w=>`<option value="${w.id}">${esc(w.name)}</option>`).join('');
+  document.getElementById('panelBody').innerHTML=`
+    <div class="bar" style="background:#d9a441"></div>
+    <div class="ptitle" style="color:#d9a441">פרויקט חדש</div>
+    <p class="pverb" style="border:none">בחר שני עולמות שהפרויקט מגשר ביניהם</p>
+    <form id="addForm">
+      <div class="form-group"><label>שם</label>
+        <input class="form-input" name="name" required placeholder="למשל: אתר מתמטיקה"/></div>
+      <div class="form-group"><label>יעד (definition of done)</label>
+        <input class="form-input" name="goal" required placeholder="מה צריך לקרות כשזה נגמר"/></div>
+      <div class="form-row">
+        <div class="form-group"><label>עולם א׳</label>
+          <select class="form-select" name="w1">${opts}</select></div>
+        <div class="form-group"><label>עולם ב׳</label>
+          <select class="form-select" name="w2">${opts}</select></div>
+      </div>
+      <div class="form-group"><label>נתיב תיקייה (לטרמינל)</label>
+        <input class="form-input" name="path" dir="ltr" placeholder="C:\\Users\\DAVID\\Desktop\\..."/></div>
+      <div class="form-row">
+        <div class="form-group"><label>GitHub (owner/repo)</label>
+          <input class="form-input" name="github" dir="ltr" placeholder="DavidPatlas-AI/my-repo"/></div>
+        <div class="form-group"><label>דמו (URL)</label>
+          <input class="form-input" name="demo" dir="ltr" placeholder="https://....netlify.app"/></div>
+      </div>
+      <div class="form-group"><label>משימה ראשונה</label>
+        <input class="form-input" name="task" placeholder="מה עושים בסשן הראשון"/></div>
+      <button type="submit" class="btn-create">צור פרויקט + סוכן</button>
+    </form>`;
+  openPanel('sheet');
+  document.getElementById('addForm').onsubmit=e=>{
+    e.preventDefault();
+    const f=new FormData(e.target);
+    const w1=f.get('w1'), w2=f.get('w2');
+    if(w1===w2){ toast('בחר שני עולמות שונים', true); return; }
+    const id=newProjectId();
+    const proj={
+      id, name:f.get('name').trim(), goal:f.get('goal').trim(),
+      thread:[w1,w2], path:(f.get('path')||BRIDGE_ROOT).trim(),
+      github:(f.get('github')||'').trim()||undefined,
+      demo:(f.get('demo')||'').trim()||undefined,
+      progress:0, status:'idle', eta:null, insight:'פרויקט חדש — הפעל סוכן או טרמינל',
+      workOrder:[{id:'s1',task:(f.get('task')||'התחל עבודה').trim(),done:false,ai:false}],
+      questions:[], answers:{}
+    };
+    DATA.projects.push(proj);
+    expanded=id;
+    refreshBrain();
+    renderDesk();
+    renderProjectPanel(id);
+    scheduleSave(true);
+    toast('פרויקט נוצר — terminals\\'+id+'.bat ייווצר בשמירה');
+  };
+}
+
+// ── Terminal ───────────────────────────────────────────────
+async function openTerminal(pid){
+  const urls = [
+    API !== null ? `/open/${pid}` : null,
+    `http://127.0.0.1:${PORT}/open/${pid}`,
+  ].filter(Boolean);
+  for(const url of urls){
+    try{
+      const r = await fetch(url);
+      if(!r.ok) continue;
+      const j = await r.json();
+      if(j.ok){ toast(`טרמינל נפתח · ${j.path}`); return; }
+    }catch(_){}
+  }
+  const cmd = `cd /d "${BRIDGE_ROOT}"\r\npowershell -ExecutionPolicy Bypass -File bridge.ps1 open ${pid}`;
+  try{ await navigator.clipboard.writeText(cmd); }catch(_){}
+  toast(`הפעל: BridgeOS\\terminals\\${pid}.bat`);
+}
+
+// ── 3D setup ─────────────────────────────────────────────
+let scene,camera,renderer,root,glowFn=null,worldMeshes=[],threadObjs=[],labelEls={};
+let starField=null,defaultFog=null,coreMesh=null,coreGlowMesh=null;
+const _threadLabelPos=new THREE.Vector3();
+let rotY=0.4,rotX=-0.15,targetZ=48,dragging=false,moved=false,lastX,lastY,downT,downX,downY,pinchD;
+let lastInteract=performance.now();
+
+function worldPosFromId(id, worlds){
+  const order = worlds.map((w,i)=>({id:w.id, angle: -90 + i*60}));
+  const R=22, CENTER=[0,0,0];
+  const o = order.find(x=>x.id===id);
+  if(!o) return [0,0,0];
+  const rad = o.angle*Math.PI/180;
+  return [R*Math.cos(rad), R*Math.sin(rad)*0.85, Math.sin(rad*1.3)*4];
+}
+
+function build3D(){
+  const el = document.getElementById('c');
+  scene = new THREE.Scene();
+  defaultFog = new THREE.FogExp2(0x07090f, 0.028);
+  scene.fog = defaultFog;
+  camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 400);
+  camera.position.set(0,0,48);
+  renderer = new THREE.WebGLRenderer({canvas:el, antialias:true, alpha:true});
+  renderer.setClearColor(0x000000, 1);
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+
+  root = new THREE.Group();
+  scene.add(root);
+
+  function glowTex(){
+    const c=document.createElement('canvas'); c.width=c.height=128;
+    const g=c.getContext('2d');
+    const grd=g.createRadialGradient(64,64,0,64,64,64);
+    grd.addColorStop(0,'rgba(255,255,255,1)');
+    grd.addColorStop(.25,'rgba(255,255,255,.55)');
+    grd.addColorStop(1,'rgba(255,255,255,0)');
+    g.fillStyle=grd; g.fillRect(0,0,128,128);
+    return new THREE.CanvasTexture(c);
+  }
+  const GLOW=glowTex();
+  function glow(col,size){
+    const m=new THREE.SpriteMaterial({map:GLOW,color:new THREE.Color(col),transparent:true,
+      blending:THREE.AdditiveBlending,depthWrite:false});
+    const s=new THREE.Sprite(m); s.scale.set(size,size,1); return s;
+  }
+
+  coreGlowMesh=glow('#ffe9b0',26); root.add(coreGlowMesh);
+  coreMesh=new THREE.Mesh(new THREE.SphereGeometry(1.3,24,24),
+    new THREE.MeshBasicMaterial({color:0xfff4d6,transparent:true,opacity:1}));
+  root.add(coreMesh);
+
+  // stars
+  const N=380,pos=new Float32Array(N*3);
+  for(let i=0;i<N;i++){
+    const r=55+Math.random()*110,t=Math.random()*Math.PI*2,p=Math.acos(2*Math.random()-1);
+    pos[i*3]=r*Math.sin(p)*Math.cos(t); pos[i*3+1]=r*Math.sin(p)*Math.sin(t); pos[i*3+2]=r*Math.cos(p);
+  }
+  const sg=new THREE.BufferGeometry();
+  sg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  starField=new THREE.Points(sg,new THREE.PointsMaterial({color:0xc8d2f0,size:0.65,transparent:true,
+    opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false}));
+  scene.add(starField);
+
+  glowFn=glow;
+  rebuildWorlds3D(glow);
+  rebuildThreads3D();
+
+  // interaction
+  el.addEventListener('mousedown',e=>pdown(e.clientX,e.clientY));
+  window.addEventListener('mousemove',e=>pmove(e.clientX,e.clientY));
+  window.addEventListener('mouseup',e=>pup(e.clientX,e.clientY));
+  el.addEventListener('wheel',e=>{targetZ=Math.max(26,Math.min(78,targetZ+e.deltaY*0.03)); lastInteract=performance.now();},{passive:true});
+  el.addEventListener('touchstart',e=>{
+    if(e.touches.length===1) pdown(e.touches[0].clientX,e.touches[0].clientY);
+    else if(e.touches.length===2){dragging=false;pinchD=tdist(e);}
+  },{passive:true});
+  window.addEventListener('touchmove',e=>{
+    if(e.touches.length===1) pmove(e.touches[0].clientX,e.touches[0].clientY);
+    else if(e.touches.length===2&&pinchD){const d=tdist(e);targetZ=Math.max(26,Math.min(78,targetZ+(pinchD-d)*0.06));pinchD=d;lastInteract=performance.now();}
+  },{passive:true});
+  window.addEventListener('touchend',e=>{if(!e.touches.length&&e.changedTouches.length)pup(e.changedTouches[0].clientX,e.changedTouches[0].clientY);pinchD=0;});
+
+  requestAnimationFrame(renderLoop);
+}
+
+function rebuildWorlds3D(glowFn){
+  worldMeshes.forEach(g=>root.remove(g));
+  worldMeshes=[]; labelEls={};
+  document.getElementById('labels').innerHTML='';
+  const glow = glowFn || (col=>{const m=new THREE.SpriteMaterial({color:new THREE.Color(col)});return new THREE.Sprite(m);});
+
+  DATA.worlds.forEach(w=>{
+    const pos = worldPosFromId(w.id, DATA.worlds);
+    const g=new THREE.Group();
+    g.position.set(pos[0],pos[1],pos[2]);
+    g.userData={id:w.id,color:w.color,name:w.name};
+
+    const halo=glow(w.color,9); g.add(halo); g.userData.halo=halo;
+    const mesh=new THREE.Mesh(new THREE.SphereGeometry(2.1,28,28),
+      new THREE.MeshBasicMaterial({color:new THREE.Color(w.color)}));
+    mesh.userData={id:w.id,type:'world'};
+    g.add(mesh); g.userData.mesh=mesh;
+
+    // satellites = projects
+    const projs = DATA.projects.filter(p=>p.thread.includes(w.id));
+    projs.forEach((p,i)=>{
+      const a=(i/Math.max(projs.length,1))*Math.PI*2;
+      const r=4.5;
+      const sp=new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r*.7,Math.sin(a*1.7)*1.4);
+      const st = p.status==='done'?'done':p.status==='waiting'?'wip':'live';
+      const dot=new THREE.Mesh(new THREE.SphereGeometry(0.38,10,10),
+        new THREE.MeshBasicMaterial({color:new THREE.Color(STATUS[st]||STATUS.ongoing)}));
+      dot.position.copy(sp);
+      dot.userData={id:p.id,type:'project'};
+      const sg=glow(STATUS[st]||'#9aa0ad',1.8); sg.position.copy(sp);
+      g.add(dot); g.add(sg);
+      g.userData.sats=(g.userData.sats||[]).concat([{dot,sg,projId:p.id}]);
+    });
+
+    root.add(g); worldMeshes.push(g);
+    const el=document.createElement('div');
+    el.className='label world-label'; el.textContent=w.name; el.style.color=w.color;
+    document.getElementById('labels').appendChild(el);
+    labelEls[w.id]=el;
+  });
+}
+
+function refreshBrain(){
+  if(!root||!glowFn||!DATA?.worlds?.length) return;
+  rebuildWorlds3D(glowFn);
+  rebuildThreads3D();
+}
+
+function setThreadsMode(on){
+  document.body.classList.toggle('threads-mode', on);
+  if(renderer) renderer.setClearColor(0x000000, on ? 0 : 1);
+  if(scene){
+    scene.fog = on ? null : defaultFog;
+    scene.background = null;
+  }
+  if(starField?.material) starField.material.opacity = on ? 0.05 : 0.5;
+}
+
+function clearThreadLabels(){
+  document.querySelectorAll('.thread-label').forEach(el=>el.remove());
+}
+
+function rebuildThreads3D(){
+  clearThreadLabels();
+  threadObjs.forEach(o=>{ root.remove(o.line); if(o.glow) root.remove(o.glow); });
+  threadObjs=[];
+  const wpos={};
+  const wm=Object.fromEntries(DATA.worlds.map(w=>[w.id,w]));
+  DATA.worlds.forEach(w=>{ wpos[w.id]=worldPosFromId(w.id,DATA.worlds); });
+
+  (DATA.threads||[]).forEach(raw=>{
+    const a=raw[0], b=raw[1];
+    const labelText=raw[2]||`${wm[a]?.name||a} · ${wm[b]?.name||b}`;
+    const pa=new THREE.Vector3(...wpos[a]);
+    const pb=new THREE.Vector3(...wpos[b]);
+    const mid=pa.clone().add(pb).multiplyScalar(0.5);
+    const ctrl=mid.clone().multiplyScalar(0.42);
+    const curve=new THREE.QuadraticBezierCurve3(pa,ctrl,pb);
+    const pts=curve.getPoints(56);
+    const geo=new THREE.BufferGeometry().setFromPoints(pts);
+    const mat=new THREE.LineBasicMaterial({color:0xe8b84a,transparent:true,opacity:0.42});
+    const line=new THREE.Line(geo,mat);
+    const glowGeo=geo.clone();
+    const glowMat=new THREE.LineBasicMaterial({color:0xfff0c8,transparent:true,opacity:0.12,
+      blending:THREE.AdditiveBlending,depthWrite:false});
+    const glowLine=new THREE.Line(glowGeo,glowMat);
+    root.add(glowLine);
+    root.add(line);
+    const labelEl=document.createElement('div');
+    labelEl.className='thread-label';
+    labelEl.textContent=labelText;
+    labelEl.title=`${wm[a]?.name||a} ↔ ${wm[b]?.name||b}`;
+    document.getElementById('labels').appendChild(labelEl);
+    threadObjs.push({a,b,line,mat,glow:glowLine,glowMat,label:labelText,curve,labelEl});
+  });
+}
+
+function threadLabelOpacity(o){
+  if(reveal) return 1;
+  if(focusedWorld && (o.a===focusedWorld||o.b===focusedWorld)) return 0.88;
+  if(expanded){
+    const pr=DATA.projects.find(p=>p.id===expanded);
+    if(pr&&(pr.thread[0]===o.a&&pr.thread[1]===o.b||pr.thread[0]===o.b&&pr.thread[1]===o.a)) return 0.85;
+  }
+  return 0;
+}
+
+function pdown(x,y){dragging=true;moved=false;lastX=downX=x;lastY=downY=y;downT=performance.now();}
+function pmove(x,y){if(!dragging)return;const dx=x-lastX,dy=y-lastY;lastX=x;lastY=y;
+  if(Math.abs(x-downX)+Math.abs(y-downY)>6)moved=true;
+  rotY+=dx*0.005;rotX+=dy*0.005;rotX=Math.max(-1,Math.min(1,rotX));lastInteract=performance.now();}
+function pup(x,y){dragging=false;if(!moved&&performance.now()-downT<350)tap(x,y);}
+function tdist(e){const a=e.touches[0],b=e.touches[1];return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);}
+
+const ray=new THREE.Raycaster();
+function tap(x,y){
+  const nd=new THREE.Vector2((x/innerWidth)*2-1,-(y/innerHeight)*2+1);
+  ray.setFromCamera(nd,camera);
+  const hits=[];
+  worldMeshes.forEach(g=>{
+    if(g.userData.mesh) hits.push(g.userData.mesh);
+    (g.userData.sats||[]).forEach(s=>hits.push(s.dot));
+  });
+  const hit=ray.intersectObjects(hits,false);
+  if(hit.length){
+    const u=hit[0].object.userData;
+    if(u.type==='project'){ expanded=u.id; renderProjectPanel(u.id); openPanel('sheet'); }
+    else { focusedWorld=u.id; showWorldProjects(u.id); openPanel('sheet'); }
+  } else closePanel();
+}
+
+function neighborWorlds(wid){
+  const s=new Set();
+  (DATA.threads||[]).forEach(([a,b])=>{if(a===wid)s.add(b);if(b===wid)s.add(a);});
+  return s;
+}
+
+function renderLoop(){
+  const now=performance.now(), t=now*0.001;
+  if(now-lastInteract>2600&&!expanded&&!reveal) rotY+=0.0011;
+  root.rotation.y+=(rotY-root.rotation.y)*0.08;
+  root.rotation.x+=(rotX-root.rotation.x)*0.08;
+  camera.position.z+=(targetZ-camera.position.z)*0.07;
+
+  worldMeshes.forEach(g=>{
+    const id=g.userData.id;
+    let op=1, halo=1;
+    if(reveal){op=0.03;halo=0.08;}
+    else if(expanded){
+      const proj=DATA.projects.find(p=>p.id===expanded);
+      const linked=proj&&proj.thread.includes(id);
+      op=linked?1:0.25; halo=linked?1.8:0.4;
+    } else if(focusedWorld){
+      if(id===focusedWorld){op=1;halo=1.6;}
+      else if(neighborWorlds(focusedWorld).has(id)){op=0.75;halo=1;}
+      else{op=0.28;halo=0.45;}
+    }
+    g.userData.mesh.material.opacity=lerp(g.userData.mesh.material.opacity??1,op,0.1);
+    g.userData.mesh.material.transparent=true;
+    g.userData.halo.scale.setScalar(lerp(g.userData.halo.scale.x,9*halo,0.1));
+    (g.userData.sats||[]).forEach(s=>{
+      const show=reveal?0:(expanded?(s.projId===expanded?1:0.2):1);
+      s.dot.material.opacity=lerp(s.dot.material.opacity??1,show,0.12);
+      s.dot.material.transparent=true;
+    });
+    const el=labelEls[id];
+    if(el){
+      const v=new THREE.Vector3(); g.getWorldPosition(v); v.y+=3; v.project(camera);
+      if(v.z>1) el.style.opacity=0;
+      else{
+        el.style.left=(v.x*0.5+0.5)*innerWidth+'px';
+        el.style.top=(-v.y*0.5+0.5)*innerHeight+'px';
+        el.style.opacity=reveal?0.42:op;
+      }
+    }
+  });
+
+  threadObjs.forEach(o=>{
+    if(!o.labelEl||!o.curve) return;
+    o.curve.getPoint(0.5,_threadLabelPos);
+    _threadLabelPos.applyMatrix4(root.matrixWorld);
+    _threadLabelPos.project(camera);
+    let op=threadLabelOpacity(o);
+    if(_threadLabelPos.z>1) op=0;
+    o.labelEl.style.left=(_threadLabelPos.x*0.5+0.5)*innerWidth+'px';
+    o.labelEl.style.top=(-_threadLabelPos.y*0.5+0.5)*innerHeight+'px';
+    o.labelEl.style.opacity=op;
+  });
+
+  if(coreMesh) coreMesh.material.opacity=lerp(coreMesh.material.opacity,reveal?0.12:1,0.1);
+  if(coreGlowMesh) coreGlowMesh.material.opacity=lerp(coreGlowMesh.material.opacity??1,reveal?0.15:1,0.1);
+
+  threadObjs.forEach(o=>{
+    let active=reveal;
+    if(!reveal){
+      active=(expanded&&DATA.projects.find(p=>p.id===expanded)?.thread.includes(o.a)&&DATA.projects.find(p=>p.id===expanded)?.thread.includes(o.b));
+      if(expanded){
+        const pr=DATA.projects.find(p=>p.id===expanded);
+        active=pr&&(pr.thread[0]===o.a&&pr.thread[1]===o.b||pr.thread[0]===o.b&&pr.thread[1]===o.a);
+      }
+      if(focusedWorld) active=(o.a===focusedWorld||o.b===focusedWorld);
+    }
+    const pulse=reveal?0.85+Math.sin(t*2+o.a.charCodeAt(1))*0.15:1;
+    o.mat.color.lerp(new THREE.Color(active?0xffd76a:0x3a4366),0.12);
+    o.mat.opacity=lerp(o.mat.opacity,active?(reveal?0.95*pulse:0.9):0.28,0.12);
+    if(o.glowMat) o.glowMat.opacity=lerp(o.glowMat.opacity,active?(reveal?0.35*pulse:0.15):0.05,0.12);
+  });
+
+  renderer.render(scene,camera);
+  requestAnimationFrame(renderLoop);
+}
+function lerp(a,b,t){return a+(b-a)*t;}
+
+// ── UI ─────────────────────────────────────────────────────
+function toast(msg,err){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.style.borderColor=err?'rgba(239,68,68,.4)':'rgba(255,255,255,.12)';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+function openPanel(mode){
+  const p=document.getElementById('panel');
+  p.className=mode+' show';
+  document.getElementById('scrim').classList.add('show');
+}
+function closePanel(){
+  expanded=null; focusedWorld=null; deskMode=false;
+  const p=document.getElementById('panel');
+  p.classList.remove('show');
+  p.className='sheet';
+  document.getElementById('scrim').classList.remove('show');
+}
+
+function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+function wmap(){ return Object.fromEntries(DATA.worlds.map(w=>[w.id,w])); }
+
+function showWorldProjects(wid){
+  const w=wmap()[wid];
+  const projs=DATA.projects.filter(p=>p.thread.includes(wid));
+  const threads=(DATA.threads||[]).filter(t=>t[0]===wid||t[1]===wid);
+  let html=`<div class="bar" style="background:${w.color}"></div>
+    <div class="ptitle" style="color:${w.color}">${w.name}</div>
+    <div class="pverb">„${w.verb||''}”</div>
+    <p style="font-size:12px;color:#8892a8;text-align:center;margin-bottom:14px">${projs.length} פרויקטים בעולם הזה</p>`;
+  projs.forEach(p=>{ html+=projectCardHtml(p,false); });
+  if(threads.length){
+    html+=`<p style="font-size:10px;letter-spacing:.2em;color:#3d4a70;margin:14px 0 8px">מתחבר אל</p>`;
+    threads.forEach(([a,b,label])=>{
+      const other=a===wid?b:a; const ow=wmap()[other];
+      if(ow) html+=`<div style="font-size:12px;color:#9098ae;margin-bottom:6px;padding:8px;background:rgba(255,255,255,.02);border-radius:8px">
+        <span style="color:${ow.color};font-weight:700">${ow.name}</span> — ${label}</div>`;
+    });
+  }
+  document.getElementById('panelBody').innerHTML=html;
+  bindCardEvents();
+}
+
+async function loadEcosystem(){
+  try{
+    const url=API!==null?'/api/ecosystem':`http://127.0.0.1:${PORT}/api/ecosystem`;
+    const r=await fetch(url);
+    if(!r.ok) return;
+    const e=await r.json();
+    const el=document.getElementById('dashStrip');
+    if(!el) return;
+    const base=API!==null?'':`http://127.0.0.1:${PORT}`;
+    let extra=`<a class="dchip nf" href="${base}/landing.html" target="_blank" rel="noopener">מדריך</a>`;
+    if(e.recentFiles?.up) extra+=`<a class="dchip" href="${e.recentFiles.url}" target="_blank" rel="noopener">📂 קבצים</a>`;
+    else extra+=`<span class="dchip" title="הפעל קבצים אחרונים">📂 כבוי</span>`;
+    if(e.statusMap?.exists){
+      const mapHref='file:///'+encodeURI(e.statusMap.path.replace(/\\/g,'/'));
+      extra+=`<a class="dchip" href="${mapHref}" target="_blank">🗺 סטטוס</a>`;
+    }
+    if(extra) el.innerHTML+=extra;
+  }catch(_){}
+}
+
+function healthBadge(state){
+  const cfg={
+    ok:{label:'תקין',color:'#34d399'},
+    warn:{label:'לבדוק',color:'#f59e0b'},
+    fail:{label:'שבור',color:'#f87171'}
+  }[state]||{label:state,color:'#8b93ab'};
+  return `<span class="mbadge" style="border-color:${cfg.color}55;color:${cfg.color};background:${cfg.color}12">${cfg.label}</span>`;
+}
+
+async function showHealthPanel(){
+  try{
+    const url=API!==null?'/api/health':`http://127.0.0.1:${PORT}/api/health`;
+    const r=await fetch(url);
+    if(!r.ok) throw new Error();
+    const h=await r.json();
+    const s=h.summary||{};
+    let html=`<div class="bar" style="background:${h.ok?'#34d399':'#f59e0b'}"></div>
+      <div class="ptitle" style="color:${h.ok?'#34d399':'#f59e0b'}">בדיקת בריאות</div>
+      <p class="pverb" style="border:none">${h.generatedAt||''} · מקומי בלבד</p>
+      <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat"><b>${s.projects??0}</b><span>פרויקטים</span></div>
+        <div class="stat"><b>${s.projectWarnings??0}</b><span>אזהרות</span></div>
+        <div class="stat"><b>${s.toolFailures??0}</b><span>כלים שבורים</span></div>
+      </div>
+      <div class="metrics">
+        ${healthBadge(s.recentFiles?'ok':'warn')}<span class="mbadge muted">קבצים אחרונים</span>
+        ${healthBadge(s.statusMap?'ok':'fail')}<span class="mbadge muted">מפת סטטוס</span>
+        ${healthBadge(s.mcp?'ok':'fail')}<span class="mbadge muted">MCP</span>
+      </div>
+      <p style="font-size:10px;letter-spacing:.18em;color:#3d4a70;margin:16px 0 8px">נתיבי פרויקטים</p>`;
+    (h.projects||[]).forEach(p=>{
+      const color=p.state==='ok'?'#34d399':p.state==='warn'?'#f59e0b':'#f87171';
+      html+=`<div class="editblock" style="margin:0 0 8px;border-color:${color}44">
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+          <b style="font-size:13px">${esc(p.name||p.id)}</b>${healthBadge(p.state)}
+        </div>
+        <div style="font-size:10px;color:#6b7596;direction:ltr;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:6px">${esc(p.path||'')}</div>
+        ${p.broad?'<div style="font-size:11px;color:#f59e0b;margin-top:6px">הנתיב רחב מדי. כדאי לחבר לתיקיית פרויקט מדויקת.</div>':''}
+        ${!p.exists?'<div style="font-size:11px;color:#f87171;margin-top:6px">התיקייה לא נמצאה.</div>':''}
+      </div>`;
+    });
+    html+=`<p style="font-size:10px;letter-spacing:.18em;color:#3d4a70;margin:16px 0 8px">כלים</p>`;
+    (h.tools||[]).forEach(t=>{
+      html+=`<div class="step" style="cursor:default">
+        <div class="chk" style="border-color:${t.exists?'#34d399':'#f87171'};color:${t.exists?'#34d399':'#f87171'}">${t.exists?'✓':'!'}</div>
+        <div class="steptxt">${esc(t.name)}<div style="font-size:10px;color:#6b7596;direction:ltr;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.path)}</div></div>
+      </div>`;
+    });
+    document.getElementById('panelBody').innerHTML=html;
+    openPanel('sheet');
+  }catch(_){ toast('בדיקת בריאות לא זמינה',true); }
+}
+
+async function showConfigPanel(){
+  try{
+    const url=API!==null?'/api/config':`http://127.0.0.1:${PORT}/api/config`;
+    const r=await fetch(url);
+    if(!r.ok) throw new Error();
+    const c=await r.json();
+    document.getElementById('panelBody').innerHTML=`
+      <div class="bar" style="background:#7aa7e0"></div>
+      <div class="ptitle" style="color:#7aa7e0">הגדרות</div>
+      <p class="pverb" style="border:none">bridge-config.json · מקומי בלבד</p>
+      <label>GitHub user</label>
+      <input class="form-input" id="cfgGhUser" dir="ltr" value="${esc(c.github?.user||'')}" />
+      <label style="margin-top:10px">GitHub token ${c.github?.tokenSet?'(מוגדר ✓)':'(ריק)'}</label>
+      <input class="form-input" id="cfgGhToken" dir="ltr" type="password" placeholder="ghp_..." />
+      <label style="margin-top:10px">Netlify token ${c.netlify?.tokenSet?'(מוגדר ✓)':'(ריק)'}</label>
+      <input class="form-input" id="cfgNfToken" dir="ltr" type="password" placeholder="nfp_..." />
+      <label style="margin-top:10px">נתיב portfolio (אופציונלי)</label>
+      <input class="form-input" id="cfgPortfolio" dir="ltr" value="${esc(c.portfolioPath||'')}" />
+      <button class="btn-create" id="saveConfigBtn" style="margin-top:14px">שמור הגדרות</button>`;
+    openPanel('sheet');
+    document.getElementById('saveConfigBtn').onclick=async()=>{
+      const body={
+        github:{user:document.getElementById('cfgGhUser').value.trim()},
+        netlify:{},
+        portfolioPath:document.getElementById('cfgPortfolio').value.trim()
+      };
+      const gt=document.getElementById('cfgGhToken').value.trim();
+      const nt=document.getElementById('cfgNfToken').value.trim();
+      if(gt) body.github.token=gt;
+      if(nt) body.netlify.token=nt;
+      const sr=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      if(sr.ok){ toast('הגדרות נשמרו ✓'); loadDashboard(); }
+      else toast('שגיאה בשמירה',true);
+    };
+  }catch(_){ toast('הפעל דרך שולחן עבודה.bat',true); }
+}
+
+async function loadRecentFiles(pid){
+  try{
+    const url=API!==null?`/api/recent/${pid}`:`http://127.0.0.1:${PORT}/api/recent/${pid}`;
+    const r=await fetch(url);
+    if(!r.ok) return;
+    const j=await r.json();
+    if(!j.ok||!j.files?.length) return;
+    const card=document.querySelector(`[data-pid="${pid}"] .editblock`);
+    if(!card) return;
+    let html=`<div class="wo" style="margin-top:12px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px">
+      <div class="wotitle">קבצים אחרונים · ${j.count}</div>`;
+    j.files.slice(0,6).forEach(f=>{
+      const when=f.modified||f.created||'';
+      html+=`<div class="step" style="cursor:default;padding:4px 0">
+        <div class="steptxt" style="font-size:11px">${esc(f.name)} <span style="color:#5d6680">${esc(when)}</span></div></div>`;
+    });
+    html+=`<a href="${esc(j.recentFilesUrl)}" target="_blank" rel="noopener" style="font-size:11px;color:#52c4a0">פתח בקבצים אחרונים →</a></div>`;
+    card.insertAdjacentHTML('afterend',html);
+  }catch(_){}
+}
+
+function renderProjectPanel(pid){
+  const p=DATA.projects.find(x=>x.id===pid);
+  if(!p) return;
+  document.getElementById('panelBody').innerHTML=projectCardHtml(p,true);
+  bindCardEvents();
+  loadRecentFiles(pid);
+}
+
+function projectCardHtml(proj, full){
+  const wm=wmap();
+  const w1=wm[proj.thread[0]], w2=wm[proj.thread[1]];
+  const tc=w1?.color||'#555', tc2=w2?.color||tc;
+  const sc=STATUS_CFG[proj.status]||STATUS_CFG.idle;
+  const done=proj.workOrder.filter(s=>s.done).length;
+  const total=proj.workOrder.length;
+  const pct=total?Math.round(done/total*100):Math.round(proj.progress*100);
+  const C=2*Math.PI*20;
+  const isLoad=loading===proj.id;
+
+  let html=`<div class="card ${full?'open':''}" data-pid="${proj.id}">
+    <div class="tbar" style="background:linear-gradient(90deg,${tc},${tc2})"></div>
+    <div class="chead">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+          <span class="sdot" style="background:${sc.color}"></span>
+          <span class="slabel" style="color:${sc.color}">${isLoad?'מחשב...':sc.label}</span>
+          ${proj.eta?`<span style="font-size:10px;color:#4b5680">· ${proj.eta}</span>`:''}
+        </div>
+        <h3>${esc(proj.name)}</h3>
+        <div style="display:flex;gap:5px;align-items:center;margin-top:4px;font-size:11px">
+          <span style="color:${tc};font-weight:600">${w1?.name}</span><span style="color:#3d4a70">↔</span>
+          <span style="color:${tc2};font-weight:600">${w2?.name}</span>
+        </div>
+      </div>
+      <svg class="ring" width="50" height="50" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="20" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="3"/>
+        <circle cx="25" cy="25" r="20" fill="none" stroke="${tc}" stroke-width="3"
+          stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct/100)}" stroke-linecap="round" transform="rotate(-90 25 25)"/>
+        <text x="25" y="29" text-anchor="middle" fill="#e8ecf6" style="font-size:10px;font-family:JetBrains Mono">${pct}%</text>
+      </svg>
+    </div>
+    <p class="goal">${esc(proj.goal)}</p>
+    ${metricsHtml(proj.id)}`;
+
+  if(proj.questions?.length){
+    html+=`<div class="qblock"><div class="qtitle">⚡ הסוכן צריך אותך</div>`;
+    proj.questions.forEach(q=>{
+      const k=`${proj.id}__${q}`;
+      html+=`<div class="qtext">${esc(q)}</div>
+        <div class="qrow"><input class="qinput" data-qkey="${k}" placeholder="תשובתך..." value="${(answerInputs[k]||'').replace(/"/g,'&quot;')}"/>
+        <button class="qbtn" data-answer="${proj.id}" data-q="${q.replace(/"/g,'&quot;')}">↵</button></div>`;
+    });
+    html+=`</div>`;
+  }
+
+  if(full){
+    html+=`<div class="wo"><div class="wotitle">סדר עבודה</div>`;
+    proj.workOrder.forEach(s=>{
+      html+=`<div class="step" data-toggle="${proj.id}" data-sid="${s.id}">
+        <div class="chk" style="border-color:${s.done?tc:'rgba(255,255,255,.18)'};background:${s.done?tc:'transparent'};color:#040608">${s.done?'✓':''}</div>
+        <div><div class="steptxt" style="opacity:${s.done?0.38:1};text-decoration:${s.done?'line-through':'none'}">${esc(s.task)}</div>
+        ${s.ai&&s.why&&!s.done?`<div class="stepwhy">${esc(s.why)}</div>`:''}</div></div>`;
+    });
+    if(proj.insight) html+=`<div class="insight"><span class="insighttxt">${esc(proj.insight)}</span></div>`;
+    html+=`<div class="editblock">
+      <label>נתיב תיקייה (טרמינל + Claude)</label>
+      <input class="path-input" data-path="${proj.id}" value="${esc(proj.path||'')}" />
+      <label style="margin-top:10px">GitHub + דמו (מטריקות)</label>
+      <input class="path-input" data-gh="${proj.id}" value="${esc(proj.github||'')}" placeholder="DavidPatlas-AI/repo" />
+      <input class="path-input" data-demo="${proj.id}" value="${esc(proj.demo||'')}" placeholder="https://....netlify.app" />
+      <button class="btn-sm" data-save-path="${proj.id}">עדכן נתיב</button>
+      <button class="btn-sm" data-save-links="${proj.id}">עדכן קישורים</button>
+      <button class="btn-sm" data-add-task="${proj.id}">+ משימה</button>
+    </div>`;
+    html+=`</div>`;
+  }
+
+  html+=`<div class="foot">
+    ${full?'':`<button class="b-expand" data-expand="${proj.id}">פרטים</button>`}
+    <button class="b-agent" data-agent="${proj.id}" style="border-color:${proj.status==='waiting'?'#f59e0b80':tc+'70'};color:${proj.status==='waiting'?'#f59e0b':tc}">
+      ${isLoad?'⟳...':proj.status==='waiting'?'⚡ המשך':'⚡ סוכן'}</button>
+    <button class="b-term" data-term="${proj.id}">⌘ טרמינל</button>
+    ${full?`<button class="b-term" data-folder="${proj.id}" title="Explorer">📁</button>`:''}
+  </div></div>`;
+  return html;
+}
+
+function bindCardEvents(){
+  document.querySelectorAll('[data-expand]').forEach(b=>b.onclick=()=>{expanded=b.dataset.expand;renderProjectPanel(expanded);});
+  document.querySelectorAll('[data-agent]').forEach(b=>b.onclick=()=>runAgent(b.dataset.agent));
+  document.querySelectorAll('[data-term]').forEach(b=>b.onclick=()=>openTerminal(b.dataset.term));
+  document.querySelectorAll('[data-folder]').forEach(b=>b.onclick=()=>openFolder(b.dataset.folder));
+  document.querySelectorAll('[data-toggle]').forEach(el=>el.onclick=()=>{
+    const pid=el.dataset.toggle, sid=el.dataset.sid;
+    setProjects(ps=>ps.map(p=>{
+      if(p.id!==pid)return p;
+      const wo=p.workOrder.map(s=>s.id===sid?{...s,done:!s.done}:s);
+      const d=wo.filter(s=>s.done).length;
+      return{...p,workOrder:wo,progress:d/Math.max(wo.length,1),status:d===wo.length&&wo.length?'done':p.status};
+    }));
+  });
+  document.querySelectorAll('.qinput').forEach(inp=>inp.oninput=()=>{answerInputs[inp.dataset.qkey]=inp.value;});
+  document.querySelectorAll('[data-save-path]').forEach(b=>b.onclick=()=>{
+    const pid=b.dataset.savePath;
+    const inp=document.querySelector(`[data-path="${pid}"]`);
+    if(!inp) return;
+    setProjects(ps=>ps.map(p=>p.id===pid?{...p,path:inp.value.trim()}:p));
+    toast('נתיב עודכן');
+  });
+  document.querySelectorAll('[data-save-links]').forEach(b=>b.onclick=()=>{
+    const pid=b.dataset.saveLinks;
+    const gh=document.querySelector(`[data-gh="${pid}"]`);
+    const demo=document.querySelector(`[data-demo="${pid}"]`);
+    setProjects(ps=>ps.map(p=>{
+      if(p.id!==pid) return p;
+      const g=(gh?.value||'').trim();
+      const d=(demo?.value||'').trim();
+      return{...p,github:g||undefined,demo:d||undefined};
+    }));
+    loadMetrics(true);
+    toast('קישורים עודכנו');
+  });
+  document.querySelectorAll('[data-add-task]').forEach(b=>b.onclick=()=>{
+    const pid=b.dataset.addTask;
+    const t=prompt('משימה חדשה:');
+    if(!t?.trim()) return;
+    setProjects(ps=>ps.map(p=>{
+      if(p.id!==pid) return p;
+      const wo=[...p.workOrder,{id:'s'+Date.now(),task:t.trim(),done:false,ai:false}];
+      return{...p,workOrder:wo,status:p.status==='done'?'running':p.status};
+    }));
+  });
+  document.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>{
+    const pid=b.dataset.answer, q=b.dataset.q, k=`${pid}__${q}`;
+    const val=(answerInputs[k]||'').trim();
+    if(!val)return;
+    setProjects(ps=>ps.map(p=>{
+      if(p.id!==pid)return p;
+      const rem=p.questions.filter(x=>x!==q);
+      return{...p,answers:{...(p.answers||{}),[q]:val},questions:rem,status:rem.length?'waiting':'running'};
+    }));
+    delete answerInputs[k];
+  });
+}
+
+function runAgent(pid){
+  if(loading) return;
+  loading=pid;
+  expanded=pid;
+  setProjects(ps=>ps.map(p=>p.id===pid?{...p,status:'thinking'}:p), false);
+  renderProjectPanel(pid);
+  setTimeout(()=>{
+    const proj=DATA.projects.find(p=>p.id===pid);
+    if(!proj){ loading=null; return; }
+    const parsed=runLocalAgent(proj);
+    applyAgentResult(pid,parsed);
+    loading=null;
+    renderProjectPanel(pid);
+    scheduleSave(false);
+    toast('סוכן מקומי — הפעל טרמינל לעבודה עם Claude');
+  },600);
+}
+
+function renderDesk(){
+  const active=DATA.projects.filter(p=>p.status==='running'||p.status==='thinking').length;
+  const wait=DATA.projects.filter(p=>p.status==='waiting'&&p.questions?.length).length;
+  const done=DATA.projects.filter(p=>p.status==='done').length;
+
+  document.getElementById('pills').innerHTML=DATA.worlds.map(w=>
+    `<div class="pill" style="border-color:${w.color}44;color:${w.color}" data-world="${w.id}">
+      <span class="pdot" style="background:${w.color}"></span>${w.name}</div>`).join('');
+
+  document.querySelectorAll('[data-world]').forEach(el=>el.onclick=()=>{
+    focusedWorld=el.dataset.world; showWorldProjects(focusedWorld); openPanel(deskMode?'desk':'sheet');
+  });
+
+  if(deskMode){
+    let html=`<div class="stats">
+      <div class="stat"><b>${DATA.projects.length}</b><span>פרויקטים</span></div>
+      <div class="stat"><b>${active}</b><span>פעילים</span></div>
+      <div class="stat"><b style="color:#f59e0b">${wait}</b><span>ממתינים</span></div>
+      <div class="stat"><b>${done}</b><span>הושלמו</span></div>
+    </div>`;
+    DATA.projects.forEach(p=>{ html+=projectCardHtml(p,false); });
+    document.getElementById('panelBody').innerHTML=html;
+    bindCardEvents();
+  }
+}
+
+function toYaml(){
+  const lines=[
+    '# BRIDGE OS — Universal Human Workspace',
+    '# Any computer · MCP · Claude Code can read this\n',
+    'worlds:',
+    ...DATA.worlds.map(w=>`  - { id: ${w.id}, name: "${w.name}", color: "${w.color}" }`),
+    '\nthreads:',
+    ...(DATA.threads||[]).map(t=>{
+      const label=(t[2]||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"');
+      return `  - [${t[0]}, ${t[1]}, "${label}"]`;
+    }),
+    '\nprojects:',
+  ];
+  DATA.projects.forEach(p=>{
+    lines.push(`  - id: ${p.id}`);
+    lines.push(`    name: "${p.name}"`);
+    lines.push(`    goal: "${p.goal}"`);
+    lines.push(`    path: "${(p.path||'').replace(/\\/g,'\\\\')}"`);
+    if(p.github) lines.push(`    github: "${p.github}"`);
+    if(p.demo) lines.push(`    demo: "${p.demo}"`);
+    lines.push(`    thread: [${p.thread.join(', ')}]`);
+    lines.push(`    agent: { status: ${p.status}, progress: ${Math.round((p.progress||0)*100)}% }`);
+    lines.push(`    work_order:`);
+    p.workOrder.forEach(t=>lines.push(`      - { task: "${t.task}", done: ${t.done} }`));
+    if(p.questions?.length) p.questions.forEach(q=>lines.push(`    question: "${q}"`));
+  });
+  return lines.join('\n');
+}
+
+function init(){
+  if(!DATA.worlds?.length){ toast('אין עולמות בנתונים — בדוק bridge-data.json', true); return; }
+  build3D();
+  renderDesk();
+  let revealFadeTimer=0;
+  function toggleThreadsMode(){
+    reveal=!reveal; closePanel();
+    setThreadsMode(reveal);
+    localStorage.setItem('bridge-threads-mode', reveal?'1':'0');
+    document.getElementById('toggle').classList.toggle('on',reveal);
+    document.getElementById('toggle').textContent=reveal?'← חזרה לעולמות':'מצב שקוף — רק חוטים';
+    const rev=document.getElementById('reveal');
+    rev.classList.toggle('show',reveal);
+    rev.classList.remove('fade-out');
+    clearTimeout(revealFadeTimer);
+    if(reveal) revealFadeTimer=setTimeout(()=>rev.classList.add('fade-out'),4200);
+    document.getElementById('hint').textContent=reveal
+      ? `${(DATA.threads||[]).length} חוטים · תוויות בעברית · T לחזרה`
+      : 'הקש על עולם · כל פרויקט → שיחה בטרמינל';
+  }
+  document.getElementById('toggle').onclick=toggleThreadsMode;
+  if(OVERLAY){
+    document.body.classList.add('overlay-mode');
+    document.getElementById('intro').style.display='none';
+    if(!reveal) toggleThreadsMode();
+    const tog=document.getElementById('toggle');
+    tog.textContent='✕ סגור שכבה';
+    tog.title='Esc לסגירה';
+    tog.onclick=()=>{
+      if(window.pywebview?.api?.close_overlay) window.pywebview.api.close_overlay();
+      else window.close();
+    };
+    const closeOverlay=()=>{
+      if(window.pywebview?.api?.close_overlay) window.pywebview.api.close_overlay();
+    };
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape') closeOverlay();
+    });
+    window.addEventListener('pywebviewready',()=>{
+      document.getElementById('hint').textContent='גרור לסיבוב · Esc לסגירה';
+    });
+  } else if(localStorage.getItem('bridge-threads-mode')==='1') toggleThreadsMode();
+  document.getElementById('pclose').onclick=closePanel;
+  document.getElementById('scrim').onclick=closePanel;
+  document.getElementById('btnDesk').onclick=()=>{
+    deskMode=!deskMode;
+    if(deskMode){ renderDesk(); openPanel('desk'); }
+    else closePanel();
+  };
+  document.getElementById('btnAdd').onclick=()=>{ closePanel(); showAddProject(); };
+  document.getElementById('btnWorlds').onclick=()=>{ closePanel(); showWorldEditor(); };
+  document.getElementById('btnThreads').onclick=()=>{ closePanel(); showThreadEditor(); };
+  document.getElementById('btnPortfolio').onclick=()=>showPortfolioPanel();
+  document.getElementById('btnMcp').onclick=()=>openMcpManifest();
+  document.getElementById('btnConfig').onclick=()=>{ closePanel(); showConfigPanel(); };
+  document.getElementById('btnHealth').onclick=()=>{ closePanel(); showHealthPanel(); };
+  document.getElementById('btnHelp').onclick=()=>{
+    const base=API!==null?'':`http://127.0.0.1:${PORT}`;
+    window.open(`${base}/landing.html`,'_blank','noopener');
+  };
+  document.getElementById('btnYaml').onclick=()=>{
+    const box=document.getElementById('yamlbox');
+    box.querySelector('span').textContent='bridge-state.yaml';
+    document.getElementById('yamlpre').textContent=toYaml();
+    box.classList.toggle('show');
+  };
+  document.getElementById('btnYamlDl').onclick=()=>{
+    const y=toYaml();
+    const blob=new Blob([y],{type:'text/yaml'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='bridge-state.yaml';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('bridge-state.yaml הורד');
+  };
+  document.getElementById('btnSave').onclick=()=>saveData(true);
+  document.getElementById('btnMetrics').onclick=async()=>{
+    toast('מרענן מטריקות...');
+    await loadMetrics(true);
+    loadDashboard();
+    try{
+      const nu=API!==null?'/api/netlify?refresh=1':`http://127.0.0.1:${PORT}/api/netlify?refresh=1`;
+      const nr=await fetch(nu);
+      if(nr.ok){
+        const nj=await nr.json();
+        if(!nj.configured) toast('Netlify: הוסף token ל-bridge-config.json');
+        else if(nj.totalPageviews30d>0) toast(`Netlify: ${nj.totalPageviews30d} צפיות (30 יום)`);
+        else toast('מטריקות עודכנו');
+      }else toast('מטריקות עודכנו');
+    }catch(_){ toast('מטריקות עודכנו'); }
+  };
+  clearInterval(metricsTimer);
+  metricsTimer=setInterval(()=>loadMetrics(false),300000);
+  document.addEventListener('keydown',e=>{
+    if(e.key==='t'||e.key==='T'){
+      if(document.activeElement?.tagName==='INPUT'||document.activeElement?.tagName==='TEXTAREA') return;
+      toggleThreadsMode();
+    }
+  });
+  setTimeout(()=>{document.getElementById('intro').style.opacity=0;},5000);
+  addEventListener('resize',()=>{
+    camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth,innerHeight);
+  });
+}
+
+loadData();
+</script>
+</body>
+</html>

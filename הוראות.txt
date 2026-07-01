@@ -1,0 +1,110 @@
+BRIDGE OS — שולחן העבודה (v2.1)
+================================
+
+חדש — אתר הסבר והורדה:
+  פתח אתר הסבר.bat
+  או: http://127.0.0.1:8787/landing.html
+
+חבילת הורדה נקייה:
+  יצירת חבילת הורדה.bat
+  נוצר: dist\BridgeOS-portable.zip
+  הקובץ bridge-config.json לא נארז כדי לא להעביר טוקנים אישיים.
+
+בדיקת בריאות:
+  בדיקת בריאות.bat
+  יוצר: BRIDGE_HEALTH_REPORT.md
+  בודק: שרת 8787, קיצורים, MCP, קבצים אחרונים, מפת סטטוס ונתיבי פרויקטים.
+
+הפעלה:
+  לחץ פעמיים: שולחן עבודה.bat (על שולחן העבודה)
+  נפתח: http://127.0.0.1:8787/
+
+חשוב:
+  אל תפתח index.html ישירות — חייב שרת מקומי.
+
+כפתורים בממשק:
+  + פרויקט    — יצירת פרויקט חדש (עולמות + נתיב + משימה)
+  עולמות      — עריכת שם, פועל וצבע לכל עולם
+  חוטים       — עריכת רשת החוטים + תוויות בעברית
+  פורטפוליו   — תצוגה מקדימה + סנכרון (both/from/to)
+  📁 בפרויקט   — פתיחת תיקייה ב-Explorer
+  MCP         — שרת MCP אמיתי + manifest (bridge-mcp-server.py)
+  רשימה       — כל הפרויקטים בפאנל
+  YAML        — הצג + הורד bridge-state.yaml (כולל threads)
+  שמור        — שמירה + COMPARTMENT_MAP + bridge-export + BRIDGE_MCP
+  ⚙           — הגדרות bridge-config.json (GitHub + Netlify tokens)
+  📡           — רענון GitHub + לייב + Netlify Analytics (7d/30d)
+  מצב שקוף    — רק רשת החוטים + תוויות בעברית (מקש T)
+
+פס סטטיסטיקות (מתחת לעולמות):
+  פרויקטים · פעילים · חוטים · לייב · צפיות Netlify (30 יום)
+  מתעדכן מ-/api/dashboard
+
+Netlify Analytics:
+  1. העתק bridge-config.example.json → bridge-config.json
+  2. הוסף netlify.token (Netlify > User settings > Personal access tokens)
+  3. כל אתר דורש Netlify Analytics בתוכנית
+  4. לחץ 📡 לרענון — badge NF מציג צפיות/30י לכל פרויקט
+
+מצב שקוף — רק חוטים:
+  כפתור בתחתית או מקש T
+  רקע שקוף, עולמות מעומעמים, 10 חוטים זוהרים
+  כל חוט מציג תווית בעברית (מ-bridge-data.json, שדה שלישי)
+  דוגמה: "אותה שאלה על AI — מבפנים ומבחוץ"
+  הטקסט המרכזי נעלם אחרי ~4 שניות — נשארות רק התוויות
+
+שקיפות אמיתית על שולחן העבודה (overlay):
+  חוטים שקוף.bat (על שולחן העבודה)
+  או: BridgeOS\הפעל overlay שקוף.bat
+  WebView2 שקוף מלא מסך — רואים טפט + חוטים זוהרים
+  דורש: pywebview (pip install pywebview) + שרת Bridge (8787)
+  Rainmeter: התקן Rainmeter חוטים.bat → כפתור 🧵 על המסך
+  סגירה: Esc · כפתור ✕ סגור שכבה · Alt+F4
+  סגור overlay.bat — כפיית סגירה
+
+חיבור MCP (Claude / Cursor):
+  1. py -3.12 -m pip install mcp
+  2. הפעל שולחן עבודה.bat (חובה — פורט 8787)
+  3. הוסף ל-MCP settings את התוכן מ-mcp-config.json
+  4. כלים: bridge_list_projects, bridge_open_terminal, bridge_metrics...
+
+API (מקומי):
+  GET  /api/dashboard      — סטטיסטיקות
+  GET  /api/mcp            — MCP manifest ל-Claude
+  GET  /api/export         — bridge-export.json
+  GET  /api/metrics        — GitHub + לייב + Netlify deploy + pageviews
+  GET  /api/netlify        — סיכום Analytics (7d/30d לכל אתר)
+  GET  /api/sync-portfolio/preview — תצוגה מקדימה לפני סנכרון
+  POST /api/sync-portfolio?direction=both — סנכרון (both|from|to)
+  GET  /api/folder/{id} — פתיחת תיקיית פרויקט
+  GET  /api/ecosystem   — סטטוס קבצים אחרונים + מפת סטטוס
+  GET  /api/recent/{id} — קבצים אחרונים לפי נתיב פרויקט
+  GET/POST /api/config  — קריאה/שמירת bridge-config.json
+  GET  /open/{id}          — טרמינל + BRIDGE_SESSION.md
+
+קבצים:
+  index.html            — ממשק (מוח 3D + סוכנים)
+  bridge-data.json      — 6 עולמות, 10 חוטים, 7 פרויקטים
+  COMPARTMENT_MAP.md    — מפת תאים (מתעדכן בשמירה)
+  bridge-export.json    — ייצוא לפורטפוליו (v1.5)
+  BRIDGE_MCP.md         — הוראות MCP (מתעדכן בשמירה)
+  bridge-mcp-server.py  — שרת MCP stdio (Python 3.12)
+  mcp-config.json       — הגדרות ל-Cursor / Claude
+  requirements-mcp.txt  — pip install mcp
+  bridge.ps1            — שרת + טרמינל + API
+  bridge-config.json    — אופציונלי: GitHub + Netlify tokens
+  bridge-portfolio.ps1  — סנכרון אוטומטי מ-portfolio.html
+  lib/three.min.js      — גרפיקה offline
+  terminals/            — p1.bat … p7.bat
+
+לכל פרויקט:
+  1. לחץ על עולם / לוויין במפה
+  2. פרטים → עדכן נתיב → ⌘ טרמינל
+  3. Claude קורא BRIDGE_SESSION.md
+
+פרויקטים מחוברים:
+  p1 הזורעים בבינה | p2 משנת יוסף | p3 תזה
+  p4 ריבניצר | p5 מתמטיקה | p6 תשובה | p7 מסלול רכב
+
+בעיות?
+  סגור חלונות Bridge OS קודמים → הפעל מחדש.
