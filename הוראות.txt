@@ -78,6 +78,7 @@ API (מקומי):
   POST /api/sync-portfolio?direction=both — סנכרון (both|from|to)
   GET  /api/folder/{id} — פתיחת תיקיית פרויקט
   GET  /api/ecosystem   — סטטוס קבצים אחרונים + מפת סטטוס
+  GET  /api/health      — בדיקת בריאות: שרת, קיצורים, MCP, כלים ונתיבי פרויקטים
   GET  /api/recent/{id} — קבצים אחרונים לפי נתיב פרויקט
   GET/POST /api/config  — קריאה/שמירת bridge-config.json
   GET  /open/{id}          — טרמינל + BRIDGE_SESSION.md

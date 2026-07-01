@@ -1,11 +1,12 @@
 # BridgeOS Health Report
 
-Generated: 2026-07-01 09:42:01
+Generated: 2026-07-01 09:48:30
 Root: "C:\Users\DAVID\Desktop\פרויקטים\BridgeOS"
 
 ## Server
 - OK: http://127.0.0.1:8787/api/info responded.
 - OK: server root -> "C:\Users\DAVID\Desktop\פרויקטים\BridgeOS"
+- WARN: could not inspect process list: Access denied 
 
 ## Projects
 - WARN broad path: p1 הזורעים בבינה -> "C:\Users\DAVID\Desktop"

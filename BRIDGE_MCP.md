@@ -1,6 +1,6 @@
 # BRIDGE MCP - Claude Code / Cursor
 
-> Updated: 2026-07-01 09:42 - http://127.0.0.1:8787/
+> Updated: 2026-07-01 09:47 - http://127.0.0.1:8787/
 
 ## MCP server (stdio)
 1. pip install -r requirements-mcp.txt  (Python 3.12: py -3.12 -m pip install mcp)

@@ -63,6 +63,7 @@ Copy `bridge-config.example.json` → `bridge-config.json`:
 | `GET /api/info` | Version, portfolio, netlify configured |
 | `GET /api/dashboard` | Stats + pageviews |
 | `GET /api/ecosystem` | Recent-files + status map status |
+| `GET /api/health` | Server, shortcut, tool, MCP, status map and project path health |
 | `GET /api/recent/{id}` | Recent files for project path |
 | `GET/POST /api/config` | Read/save bridge-config.json |
 | `GET /api/metrics` | GitHub + live + Netlify |
